@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+docs/_build
+bin/
+include/
+lib/
+lib64/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
