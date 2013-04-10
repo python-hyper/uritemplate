@@ -17,6 +17,6 @@ __copyright__ = 'Copyright 2013 Ian Cordasco'
 __version__ = '0.0.0'
 __version_info__ = tuple(int(i) for i in __version__.split(','))
 
-from uritemplate.api import Template, expand
+from uritemplate.api import URITemplate, expand
 
-__all__ = [Template, expand]
+__all__ = [URITemplate, expand]

@@ -7,8 +7,8 @@ This module contains the essential inner workings of uritemplate.
 
 What treasures await you:
 
-- Template class
-- Variable class
+- URITemplate class
+- URIVariable class
 
 """
 try:
@@ -22,17 +22,17 @@ import re
 template_re = re.compile('{([^\}]+)}')
 
 
-class Template(object):
-    """The :class:`Template <Template>` object is the central object to
+class URITemplate(object):
+    """The :class:`URITemplate <URITemplate>` object is the central object to
     uritemplate. This parses the template and will be used to expand it.
 
     Example::
 
-        from uritemplate import Template
+        from uritemplate import URITemplate
         import requests
 
 
-        t = Template(
+        t = URITemplate(
             'https://api.github.com/users/sigmavirus24/gists{/gist_id}'
         )
         uri = t.expand(gist_id=123456)
@@ -44,20 +44,20 @@ class Template(object):
     def __init__(self, uri):
         self.uri = uri
         self.var_list = [
-            Variable(m.groups()[0]) for m in template_re.finditer(self.uri)
+            URIVariable(m.groups()[0]) for m in template_re.finditer(self.uri)
         ]
 
     def __repr__(self):
-        return 'Template({0})'.format(self.uri)
+        return 'URITemplate({0})'.format(self.uri)
 
     def expand(self, *args, **kwargs):
         pass
 
 
-class Variable(object):
-    """The :class:`Variable <Variable>` object validates everything underneath
-    the Template object. It validates template expansions and will truncate
-    length as decided by the template.
+class URIVariable(object):
+    """The :class:`URIVariable <URIVariable>` object validates everything
+    underneath the Template object. It validates template expansions and will
+    truncate length as decided by the template.
     """
 
     operators = ('+', '#', '.', '/', ';', '?', '&', '|', '!', '@')
@@ -70,14 +70,14 @@ class Variable(object):
         #self.parse()
 
     def __repr__(self):
-        return 'Variable({0})'.format(self.original)
+        return 'URIVariable({0})'.format(self.original)
 
     def parse(self):
-        if self.original[0] in Variable.operators:
+        if self.original[0] in URIVariable.operators:
             self.operator = self.orig[0]
 
-        if self.operator in Variable.operators[:2]:
-            self.safe = Variable.reserved
+        if self.operator in URIVariable.operators[:2]:
+            self.safe = URIVariable.reserved
             var_list = self.original[1:].split(',')
         else:
             var_list = self.original.split(',')
