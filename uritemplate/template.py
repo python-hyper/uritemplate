@@ -68,20 +68,20 @@ class URIVariable(object):
         self.operator = None
         self.safe = '/'
         self.vars = []
-        #self.parse()
+        self.parse()
 
     def __repr__(self):
         return 'URIVariable({0})'.format(self.original)
 
     def parse(self):
         if self.original[0] in URIVariable.operators:
-            self.operator = self.orig[0]
+            self.operator = self.original[0]
+            var_list = self.original[1:]
 
         if self.operator in URIVariable.operators[:2]:
             self.safe = URIVariable.reserved
-            var_list = self.original[1:].split(',')
-        else:
-            var_list = self.original.split(',')
+
+        var_list = var_list.split(',')
 
         self.defaults = {}
         for var in var_list:
@@ -92,10 +92,10 @@ class URIVariable(object):
 
             explode = True if name.endswith('*') else False
 
-            prefix_index = name.index(':')
-            if prefix_index > 0:
-                prefix = int(name[prefix_index + 1:])
-                name = name[:prefix_index]
+            prefix = None
+            if ':' in name:
+                name, prefix = tuple(name.split(':', 1))
+                prefix = int(prefix)
 
             if default_val:
                 self.defaults[name] = default_val
