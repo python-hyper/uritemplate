@@ -67,6 +67,7 @@ class URIVariable(object):
         self.original = var
         self.operator = None
         self.safe = '/'
+        self.vars = []
         #self.parse()
 
     def __repr__(self):
@@ -82,9 +83,25 @@ class URIVariable(object):
         else:
             var_list = self.original.split(',')
 
+        self.defaults = {}
         for var in var_list:
-            pass
+            default_val = None
+            name = var
+            if '=' in var:
+                name, default_val = tuple(var.split('=', 1))
 
-    def substitute(self, *args, **kwargs):
+            explode = True if name.endswith('*') else False
+
+            prefix_index = name.index(':')
+            if prefix_index > 0:
+                prefix = int(name[prefix_index + 1:])
+                name = name[:prefix_index]
+
+            if default_val:
+                self.defaults[name] = default_val
+
+            self.vars.append((name, {'explode': explode, 'prefix': prefix}))
+
+    def expand(self, *args, **kwargs):
         args = [quote(a, self.safe) for a in args]
         kwargs = dict((k, quote(v)) for k, v in kwargs.items())
