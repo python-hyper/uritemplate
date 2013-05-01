@@ -43,7 +43,7 @@ class URITemplate(object):
     """
     def __init__(self, uri):
         self.uri = uri
-        self.var_list = [
+        self.variables = [
             URIVariable(m.groups()[0]) for m in template_re.finditer(self.uri)
         ]
 
@@ -51,7 +51,9 @@ class URITemplate(object):
         return 'URITemplate({0})'.format(self.uri)
 
     def expand(self, *args, **kwargs):
-        pass
+        if not self.variables:
+            return self.uri
+        return ''
 
 
 class URIVariable(object):
