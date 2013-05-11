@@ -12,6 +12,7 @@ from uritemplate.template import URITemplate
 def expand(uri, var_dict=None, **kwargs):
     """Expand the template with the given parameters.
 
+    :param str uri: The templated URI to expand
     :param dict var_dict: Optional dictionary with variables and values
     :param kwargs: Alternative way to pass arguments
     :returns: str

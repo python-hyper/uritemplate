@@ -40,6 +40,17 @@ class URITemplate(object):
         for gist in resp.json():
             print(gist['html_url'])
 
+    Please note::
+
+        str(t)
+        # 'https://api.github.com/users/sigmavirus24/gists{/gistid}'
+        repr(t)  # is equivalent to
+        # URITemplate(str(t))
+        # Where str(t) is interpreted as the URI string.
+
+    Also, ``URITemplates`` are hashable so they can be used as keys in
+    dictionaries.
+
     """
     def __init__(self, uri):
         self.uri = uri
@@ -48,7 +59,7 @@ class URITemplate(object):
         ]
 
     def __repr__(self):
-        return 'URITemplate({0})'.format(self.uri)
+        return 'URITemplate({0})'.format(self)
 
     def __str__(self):
         return self.uri
@@ -84,6 +95,10 @@ class URIVariable(object):
     """The :class:`URIVariable <URIVariable>` object validates everything
     underneath the Template object. It validates template expansions and will
     truncate length as decided by the template.
+
+    Please note that just like the :class:`URITemplate <URITemplate>`, this
+    object's ``__str__`` and ``__repr__`` methods do not return the same
+    information. Calling ``str(var)`` will return the original variable.
     """
 
     operators = ('+', '#', '.', '/', ';', '?', '&', '|', '!', '@')
@@ -98,7 +113,10 @@ class URIVariable(object):
         self.parse()
 
     def __repr__(self):
-        return 'URIVariable({0})'.format(self.original)
+        return 'URIVariable({0})'.format(self)
+
+    def __str__(self):
+        return self.original
 
     def parse(self):
         """Parse the variable: find the operator, the set of safe characters,
