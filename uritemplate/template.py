@@ -50,9 +50,33 @@ class URITemplate(object):
     def __repr__(self):
         return 'URITemplate({0})'.format(self.uri)
 
-    def expand(self, *args, **kwargs):
+    def __str__(self):
+        return self.uri
+
+    def __hash__(self):
+        return hash(self.uri)
+
+    def expand(self, var_dict=None, **kwargs):
+        """Expand the template with the given parameters.
+
+        :param dict var_dict: Optional dictionary with variables and values
+        :param kwargs: Alternative way to pass arguments
+        :returns: str
+
+        Example::
+
+            t = URITemplate('https://api.github.com{/end}')
+            t.expand({'end': 'users'})
+            t.expand(end='gists')
+
+        .. note:: Passing values by both parts, will override values in
+                  ``var_dict``.
+        """
         if not self.variables:
             return self.uri
+
+        expansion = var_dict or {}
+        expansion.update(kwargs)
         return ''
 
 
@@ -70,12 +94,16 @@ class URIVariable(object):
         self.operator = None
         self.safe = '/'
         self.vars = []
+        self.defaults = {}
         self.parse()
 
     def __repr__(self):
         return 'URIVariable({0})'.format(self.original)
 
     def parse(self):
+        """Parse the variable: find the operator, the set of safe characters,
+        all the variables and the defaults.
+        """
         if self.original[0] in URIVariable.operators:
             self.operator = self.original[0]
             var_list = self.original[1:]
@@ -85,7 +113,6 @@ class URIVariable(object):
 
         var_list = var_list.split(',')
 
-        self.defaults = {}
         for var in var_list:
             default_val = None
             name = var
@@ -104,6 +131,8 @@ class URIVariable(object):
 
             self.vars.append((name, {'explode': explode, 'prefix': prefix}))
 
-    def expand(self, *args, **kwargs):
-        args = [quote(a, self.safe) for a in args]
-        kwargs = dict((k, quote(v)) for k, v in kwargs.items())
+    def expand(self, var_dict=None):
+        """Expand the variable in question using ``var_dict`` and the
+        parsed defaults.
+        """
+        var_dict = dict((k, quote(v)) for k, v in var_dict.items())
