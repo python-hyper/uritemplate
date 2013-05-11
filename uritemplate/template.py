@@ -23,8 +23,10 @@ template_re = re.compile('{([^\}]+)}')
 
 
 class URITemplate(object):
-    """The :class:`URITemplate <URITemplate>` object is the central object to
-    uritemplate. This parses the template and will be used to expand it.
+
+    """This parses the template and will be used to expand it.
+
+    This is the most important object as the center of the API.
 
     Example::
 
@@ -52,6 +54,7 @@ class URITemplate(object):
     dictionaries.
 
     """
+
     def __init__(self, uri):
         self.uri = uri
         self.variables = [
@@ -82,6 +85,7 @@ class URITemplate(object):
 
         .. note:: Passing values by both parts, will override values in
                   ``var_dict``.
+
         """
         if not self.variables:
             return self.uri
@@ -92,13 +96,16 @@ class URITemplate(object):
 
 
 class URIVariable(object):
-    """The :class:`URIVariable <URIVariable>` object validates everything
-    underneath the Template object. It validates template expansions and will
-    truncate length as decided by the template.
+
+    """This object validates everything inside the URITemplate object.
+
+    It validates template expansions and will truncate length as decided by
+    the template.
 
     Please note that just like the :class:`URITemplate <URITemplate>`, this
     object's ``__str__`` and ``__repr__`` methods do not return the same
     information. Calling ``str(var)`` will return the original variable.
+
     """
 
     operators = ('+', '#', '.', '/', ';', '?', '&', '|', '!', '@')
@@ -119,8 +126,14 @@ class URIVariable(object):
         return self.original
 
     def parse(self):
-        """Parse the variable: find the operator, the set of safe characters,
-        all the variables and the defaults.
+        """Parse the variable.
+
+        This finds the:
+            - operator,
+            - set of safe characters,
+            - variables, and
+            - defaults.
+
         """
         if self.original[0] in URIVariable.operators:
             self.operator = self.original[0]
@@ -150,7 +163,10 @@ class URIVariable(object):
             self.vars.append((name, {'explode': explode, 'prefix': prefix}))
 
     def expand(self, var_dict=None):
-        """Expand the variable in question using ``var_dict`` and the
-        parsed defaults.
+        """Expand the variable in question.
+
+        Using ``var_dict`` and the previously parsed defaults, expand this
+        variable and subvariables.
+
         """
         var_dict = dict((k, quote(v)) for k, v in var_dict.items())

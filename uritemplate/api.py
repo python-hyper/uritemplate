@@ -24,6 +24,7 @@ def expand(uri, var_dict=None, **kwargs):
 
     .. note:: Passing values by both parts, will override values in
               ``var_dict``.
+
     """
     t = URITemplate(uri)
     return t.expand(var_dict, **kwargs)
