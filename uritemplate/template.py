@@ -18,6 +18,7 @@ except ImportError:
     from urllib.parse import quote
 
 import re
+import collections
 
 template_re = re.compile('{([^\}]+)}')
 
@@ -92,7 +93,11 @@ class URITemplate(object):
 
         expansion = var_dict or {}
         expansion.update(kwargs)
-        return ''
+        expanded = {}
+        for v in self.variables:
+            expanded.update(v.expand(expansion))
+
+        return self.uri.format(**expanded)
 
 
 class URIVariable(object):
@@ -113,11 +118,22 @@ class URIVariable(object):
 
     def __init__(self, var):
         self.original = var
-        self.operator = None
+        self.operator = ''
         self.safe = '/'
         self.vars = []
         self.defaults = {}
         self.parse()
+
+        self.start = self.join_str = self.operator
+        if self.operator in ('+', '#', ''):
+            self.join_str = ','
+        if self.operator == '#':
+            self.start = '#'
+        if self.operator == '?':
+            self.start = '?'
+            self.join_str = '&'
+        if self.operator == '&':
+            self.start = self.join_str = '&'
 
     def __repr__(self):
         return 'URIVariable({0})'.format(self)
@@ -135,6 +151,7 @@ class URIVariable(object):
             - defaults.
 
         """
+        var_list = self.original
         if self.original[0] in URIVariable.operators:
             self.operator = self.original[0]
             var_list = self.original[1:]
@@ -150,7 +167,10 @@ class URIVariable(object):
             if '=' in var:
                 name, default_val = tuple(var.split('=', 1))
 
-            explode = True if name.endswith('*') else False
+            explode = False
+            if name.endswith('*'):
+                explode = True
+                name = name[:-1]
 
             prefix = None
             if ':' in name:
@@ -162,6 +182,145 @@ class URIVariable(object):
 
             self.vars.append((name, {'explode': explode, 'prefix': prefix}))
 
+    def _query_expansion(self, name, value, explode, prefix):
+        """Expansion method for the '?' and '&' operators."""
+        if value is None or (len(value) == 0 and value != ""):
+            return None
+
+        safe = self.safe
+        if isinstance(value, (list, tuple)):
+            if explode:
+                return self.join_str.join(
+                    '%s=%s' % (name, quote(v, safe)) for v in value
+                )
+            else:
+                value = ','.join(quote(v, safe) for v in value)
+                return '%s=%s' % (name, value)
+
+        if isinstance(value, (dict, collections.MutableMapping)):
+            items = sorted(value.items())
+            if explode:
+                return self.join_str.join(
+                    '%s=%s' % (
+                        quote(k, safe), quote(v, safe)
+                    ) for k, v in items
+                )
+            else:
+                value = ','.join(
+                    '%s,%s' % (
+                        quote(k, safe), quote(v, safe)
+                    ) for k, v in items
+                )
+                return '%s=%s' % (name, value)
+
+        if value:
+            value = value[:prefix] if prefix else value
+            return '%s=%s' % (name, quote(value, safe))
+        return name + '='
+
+    def _label_path_expansion(self, name, value, explode, prefix):
+        """Label and path expansion method.
+
+        Expands for operators: '/', '.'
+
+        """
+        join_str = self.join_str
+        safe = self.safe
+
+        if value is None or (len(value) == 0 and value != ''):
+            return None
+
+        if isinstance(value, (list, tuple)):
+            if not explode:
+                join_str = ','
+
+            expanded = join_str.join(
+                quote(v, safe) for v in value if value is not None
+            )
+            return expanded if expanded else None
+
+        if isinstance(value, (dict, collections.MutableMapping)):
+            format_str = '%s=%s'
+            if not explode:
+                format_str = '%s,%s'
+                join_str = ','
+
+            expanded = join_str.join(
+                format_str % (
+                    quote(k, safe), quote(v, safe)
+                ) for k, v in sorted(value.items()) if v is not None
+            )
+            return expanded if expanded else None
+
+        value = value[:prefix] if prefix else value
+        return quote(value, safe)
+
+    def _semi_path_expansion(self, name, value, explode, prefix):
+        """Expansion method for ';' operator."""
+        join_str = self.join_str
+        safe = self.safe
+
+        if value is None:
+            return None
+
+        if self.operator == '?':
+            join_str = '&'
+
+        if isinstance(value, (list, tuple)):
+            if explode:
+                expanded = join_str.join(
+                    '%s=%s' % (
+                        name, quote(v, safe)
+                    ) for v in value if v is not None
+                )
+                return expanded if expanded else None
+            else:
+                value = ','.join(quote(v, safe) for v in value)
+                return '%s=%s' % (name, value)
+
+        if isinstance(value, (dict, collections.MutableMapping)):
+            items = sorted(value.items())
+            if explode:
+                return join_str.join(
+                    '%s=%s' % (
+                        quote(k, safe), quote(v, safe)
+                    ) for k, v in items if v is not None
+                )
+            else:
+                expanded = ','.join(
+                    '%s,%s' % (
+                        quote(k, safe), quote(v, safe)
+                    ) for k, v in items if v is not None
+                )
+                return '%s=%s' % name, expanded
+
+        if value:
+            return '%s=%s' % name, quote(value, safe)
+
+        return name
+
+    def _string_expansion(self, name, value, explode, prefix):
+        if value is None:
+            return None
+
+        if isinstance(value, (list, tuple)):
+            return ','.join(quote(v, self.safe) for v in value)
+
+        if isinstance(value, (dict, collections.MutableMapping)):
+            if explode:
+                format_str = '%s=%s'
+            else:
+                format_str = '%s,%s'
+
+            return ','.join(
+                format_str % (
+                    quote(k, self.safe), quote(v, self.safe)
+                ) for k, v in sorted(value.items())
+            )
+
+        value = value[:prefix] if prefix else value
+        return quote(value, self.safe)
+
     def expand(self, var_dict=None):
         """Expand the variable in question.
 
@@ -169,4 +328,34 @@ class URIVariable(object):
         variable and subvariables.
 
         """
-        var_dict = dict((k, quote(v)) for k, v in var_dict.items())
+        return_values = []
+
+        for name, opts in self.vars:
+            value = var_dict.get(name, None)
+            if not value and value != "" and name in self.defaults:
+                value = self.defaults[name]
+
+            if value is None:
+                continue
+
+            expanded = None
+            if self.operator in ('/', '.'):
+                expansion = self._label_path_expansion
+            elif self.operator in ('?', '&'):
+                expansion = self._query_expansion
+            elif self.operator == ';':
+                expansion = self._semi_path_expansion
+            else:
+                expansion = self._string_expansion
+
+            expanded = expansion(name, value, opts['explode'], opts['prefix'])
+
+            if expanded is not None:
+                return_values.append(expanded)
+
+            expanded = None
+
+        if return_values:
+            return {
+                self.original: self.start + self.join_str.join(return_values)
+            }

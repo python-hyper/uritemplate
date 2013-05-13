@@ -26,5 +26,4 @@ def expand(uri, var_dict=None, **kwargs):
               ``var_dict``.
 
     """
-    t = URITemplate(uri)
-    return t.expand(var_dict, **kwargs)
+    return URITemplate(uri).expand(var_dict, **kwargs)
