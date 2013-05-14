@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from uritemplate import URITemplate
+from uritemplate import URITemplate, expand
 from six import with_metaclass
 
 
@@ -420,6 +420,8 @@ class TestURITemplate(with_metaclass(RFCTemplateExamples, TestCase)):
         t = URITemplate('https://api.github.com/users{/user}')
         expanded = 'https://api.github.com/users/sigmavirus24'
         self.assertEqual(t.expand(user='sigmavirus24'), expanded)
+        v = t.variables[0]
+        self.assertEqual(v.expand({'user': None}), {})
 
         # Multiple
         t = URITemplate('https://api.github.com/users{/user}{/repo}')
@@ -429,13 +431,66 @@ class TestURITemplate(with_metaclass(RFCTemplateExamples, TestCase)):
             expanded
         )
 
-    def test_str(self):
+    def test_str_repr(self):
         uri = 'https://api.github.com{/endpoint}'
-        self.assertEqual(str(URITemplate(uri)), uri)
+        t = URITemplate(uri)
+        self.assertEqual(str(t), uri)
+        self.assertEqual(str(t.variables[0]), '/endpoint')
+        self.assertEqual(repr(t), 'URITemplate(%s)' % uri)
+        self.assertEqual(repr(t.variables[0]), 'URIVariable(/endpoint)')
 
     def test_hash(self):
         uri = 'https://api.github.com{/endpoint}'
         self.assertEqual(hash(URITemplate(uri)), hash(uri))
+
+    def test_default_value(self):
+        uri = 'https://api.github.com/user{/user=sigmavirus24}'
+        t = URITemplate(uri)
+        self.assertEqual(t.expand(),
+                         'https://api.github.com/user/sigmavirus24')
+        self.assertEqual(t.expand(user='lukasa'),
+                         'https://api.github.com/user/lukasa')
+
+    def test_query_expansion(self):
+        t = URITemplate('{foo}')
+        self.assertEqual(
+            t.variables[0]._query_expansion('foo', None, False, False), None
+        )
+
+    def test_label_path_expansion(self):
+        t = URITemplate('{foo}')
+        self.assertEqual(
+            t.variables[0]._label_path_expansion('foo', None, False, False),
+            None
+        )
+
+    def test_semi_path_expansion(self):
+        t = URITemplate('{foo}')
+        v = t.variables[0]
+        self.assertEqual(
+            v._semi_path_expansion('foo', None, False, False),
+            None
+        )
+        t.variables[0].operator = '?'
+        self.assertEqual(
+            v._semi_path_expansion('foo', ['bar', 'bogus'], True, False),
+            'foo=bar&foo=bogus'
+        )
+
+    def test_string_expansion(self):
+        t = URITemplate('{foo}')
+        self.assertEqual(
+            t.variables[0]._string_expansion('foo', None, False, False),
+            None
+        )
+
+
+class TestAPI(TestCase):
+    uri = 'https://api.github.com{/endpoint}'
+
+    def test_expand(self):
+        self.assertEqual(expand(self.uri, {'endpoint': 'users'}),
+                         'https://api.github.com/users')
 
 
 if __name__ == '__main__':

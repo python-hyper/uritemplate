@@ -378,6 +378,8 @@ class URIVariable(object):
                 self.original: self.start + self.join_str.join(return_values)
             }
 
+        return {}
+
 
 def is_list_of_tuples(value):
     if not isinstance(value, (list, tuple)):
