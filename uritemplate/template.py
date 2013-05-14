@@ -63,7 +63,7 @@ class URITemplate(object):
         ]
 
     def __repr__(self):
-        return 'URITemplate({0})'.format(self)
+        return 'URITemplate(%s)' % self
 
     def __str__(self):
         return self.uri
@@ -97,7 +97,10 @@ class URITemplate(object):
         for v in self.variables:
             expanded.update(v.expand(expansion))
 
-        return self.uri.format(**expanded)
+        def replace(match):
+            return expanded.get(match.groups()[0], '')
+
+        return template_re.sub(replace, self.uri)
 
 
 class URIVariable(object):
@@ -119,12 +122,14 @@ class URIVariable(object):
     def __init__(self, var):
         self.original = var
         self.operator = ''
-        self.safe = '/'
+        self.safe = ''
         self.vars = []
         self.defaults = {}
         self.parse()
 
         self.start = self.join_str = self.operator
+        if self.operator == '+':
+            self.start = ''
         if self.operator in ('+', '#', ''):
             self.join_str = ','
         if self.operator == '#':
@@ -135,8 +140,11 @@ class URIVariable(object):
         if self.operator == '&':
             self.start = self.join_str = '&'
 
+        if self.operator in ('+', '#'):
+            self.safe = URIVariable.reserved
+
     def __repr__(self):
-        return 'URIVariable({0})'.format(self)
+        return 'URIVariable(%s)' % self
 
     def __str__(self):
         return self.original
@@ -187,8 +195,10 @@ class URIVariable(object):
         if value is None or (len(value) == 0 and value != ""):
             return None
 
+        tuples = is_list_of_tuples(value)
+
         safe = self.safe
-        if isinstance(value, (list, tuple)):
+        if isinstance(value, (list, tuple)) and not tuples:
             if explode:
                 return self.join_str.join(
                     '%s=%s' % (name, quote(v, safe)) for v in value
@@ -197,8 +207,8 @@ class URIVariable(object):
                 value = ','.join(quote(v, safe) for v in value)
                 return '%s=%s' % (name, value)
 
-        if isinstance(value, (dict, collections.MutableMapping)):
-            items = sorted(value.items())
+        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
+            items = value if tuples else sorted(value.items())
             if explode:
                 return self.join_str.join(
                     '%s=%s' % (
@@ -230,7 +240,9 @@ class URIVariable(object):
         if value is None or (len(value) == 0 and value != ''):
             return None
 
-        if isinstance(value, (list, tuple)):
+        tuples = is_list_of_tuples(value)
+
+        if isinstance(value, (list, tuple)) and not tuples:
             if not explode:
                 join_str = ','
 
@@ -239,7 +251,8 @@ class URIVariable(object):
             )
             return expanded if expanded else None
 
-        if isinstance(value, (dict, collections.MutableMapping)):
+        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
+            items = value if tuples else sorted(value.items())
             format_str = '%s=%s'
             if not explode:
                 format_str = '%s,%s'
@@ -248,7 +261,7 @@ class URIVariable(object):
             expanded = join_str.join(
                 format_str % (
                     quote(k, safe), quote(v, safe)
-                ) for k, v in sorted(value.items()) if v is not None
+                ) for k, v in items if v is not None
             )
             return expanded if expanded else None
 
@@ -266,7 +279,9 @@ class URIVariable(object):
         if self.operator == '?':
             join_str = '&'
 
-        if isinstance(value, (list, tuple)):
+        tuples = is_list_of_tuples(value)
+
+        if isinstance(value, (list, tuple)) and not tuples:
             if explode:
                 expanded = join_str.join(
                     '%s=%s' % (
@@ -278,8 +293,9 @@ class URIVariable(object):
                 value = ','.join(quote(v, safe) for v in value)
                 return '%s=%s' % (name, value)
 
-        if isinstance(value, (dict, collections.MutableMapping)):
-            items = sorted(value.items())
+        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
+            items = value if tuples else sorted(value.items())
+
             if explode:
                 return join_str.join(
                     '%s=%s' % (
@@ -292,10 +308,11 @@ class URIVariable(object):
                         quote(k, safe), quote(v, safe)
                     ) for k, v in items if v is not None
                 )
-                return '%s=%s' % name, expanded
+                return '%s=%s' % (name, expanded)
 
+        value = value[:prefix] if prefix else value
         if value:
-            return '%s=%s' % name, quote(value, safe)
+            return '%s=%s' % (name, quote(value, safe))
 
         return name
 
@@ -303,10 +320,13 @@ class URIVariable(object):
         if value is None:
             return None
 
-        if isinstance(value, (list, tuple)):
+        tuples = is_list_of_tuples(value)
+
+        if isinstance(value, (list, tuple)) and not tuples:
             return ','.join(quote(v, self.safe) for v in value)
 
-        if isinstance(value, (dict, collections.MutableMapping)):
+        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
+            items = value if tuples else sorted(value.items())
             if explode:
                 format_str = '%s=%s'
             else:
@@ -315,7 +335,7 @@ class URIVariable(object):
             return ','.join(
                 format_str % (
                     quote(k, self.safe), quote(v, self.safe)
-                ) for k, v in sorted(value.items())
+                ) for k, v in items
             )
 
         value = value[:prefix] if prefix else value
@@ -332,7 +352,7 @@ class URIVariable(object):
 
         for name, opts in self.vars:
             value = var_dict.get(name, None)
-            if not value and value != "" and name in self.defaults:
+            if not value and value != '' and name in self.defaults:
                 value = self.defaults[name]
 
             if value is None:
@@ -353,9 +373,19 @@ class URIVariable(object):
             if expanded is not None:
                 return_values.append(expanded)
 
-            expanded = None
-
         if return_values:
             return {
                 self.original: self.start + self.join_str.join(return_values)
             }
+
+
+def is_list_of_tuples(value):
+    if not isinstance(value, (list, tuple)):
+        return False
+
+    try:
+        dict(value)
+    except:
+        return False
+    else:
+        return True

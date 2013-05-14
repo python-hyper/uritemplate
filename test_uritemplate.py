@@ -1,9 +1,392 @@
 from unittest import TestCase, main
 from uritemplate import URITemplate
-from uritemplate.template import URIVariable
+from six import with_metaclass
 
 
-class TestURITemplate(TestCase):
+def merge_dicts(*args):
+    d = {}
+    for arg in args:
+        d.update(arg)
+    return d
+
+
+class RFCTemplateExamples(type):
+    var = {'var': 'value'}
+    hello = {'hello': 'Hello World!'}
+    path = {'path': '/foo/bar'}
+    x = {'x': '1024'}
+    y = {'y': '768'}
+    empty = {'empty': ''}
+    merged_x_y = merge_dicts(x, y)
+    list_ex = {'list': ['red', 'green', 'blue']}
+    keys = {'keys': [('semi', ';'), ('dot', '.'), ('comma', ',')]}
+
+    ## Level 1
+    # Simple string expansion
+    level1_examples = {
+        '{var}': {
+            'expansion': var,
+            'expected': 'value',
+        },
+        '{hello}': {
+            'expansion': hello,
+            'expected': 'Hello%20World%21',
+        },
+    }
+
+    ## Level 2
+    # Reserved string expansion
+    level2_reserved_examples = {
+        '{+var}': {
+            'expansion': var,
+            'expected': 'value',
+        },
+        '{+hello}': {
+            'expansion': hello,
+            'expected': 'Hello%20World!',
+        },
+        '{+path}/here': {
+            'expansion': path,
+            'expected': '/foo/bar/here',
+        },
+        'here?ref={+path}': {
+            'expansion': path,
+            'expected': 'here?ref=/foo/bar',
+        },
+    }
+
+    # Fragment expansion, crosshatch-prefixed
+    level2_fragment_examples = {
+        'X{#var}': {
+            'expansion': var,
+            'expected': 'X#value',
+        },
+        'X{#hello}': {
+            'expansion': hello,
+            'expected': 'X#Hello%20World!'
+        },
+    }
+
+    ## Level 3
+    # String expansion with multiple variables
+    level3_multiple_variable_examples = {
+        'map?{x,y}': {
+            'expansion': merged_x_y,
+            'expected': 'map?1024,768',
+        },
+        '{x,hello,y}': {
+            'expansion': merge_dicts(x, y, hello),
+            'expected': '1024,Hello%20World%21,768',
+        },
+    }
+
+    # Reserved expansion with multiple variables
+    level3_reserved_examples = {
+        '{+x,hello,y}': {
+            'expansion': merge_dicts(x, y, hello),
+            'expected': '1024,Hello%20World!,768',
+        },
+        '{+path,x}/here': {
+            'expansion': merge_dicts(path, x),
+            'expected': '/foo/bar,1024/here',
+        },
+    }
+
+    # Fragment expansion with multiple variables
+    level3_fragment_examples = {
+        '{#x,hello,y}': {
+            'expansion': merge_dicts(x, y, hello),
+            'expected': '#1024,Hello%20World!,768',
+        },
+        '{#path,x}/here': {
+            'expansion': merge_dicts(path, x),
+            'expected': '#/foo/bar,1024/here'
+        },
+    }
+
+    # Label expansion, dot-prefixed
+    level3_label_examples = {
+        'X{.var}': {
+            'expansion': var,
+            'expected': 'X.value',
+        },
+        'X{.x,y}': {
+            'expansion': merged_x_y,
+            'expected': 'X.1024.768',
+        }
+    }
+
+    # Path segments, slash-prefixed
+    level3_path_segment_examples = {
+        '{/var}': {
+            'expansion': var,
+            'expected': '/value',
+        },
+        '{/var,x}/here': {
+            'expansion': merge_dicts(var, x),
+            'expected': '/value/1024/here',
+        },
+    }
+
+    # Path-style parameters, semicolon-prefixed
+    level3_path_semi_examples = {
+        '{;x,y}': {
+            'expansion': merged_x_y,
+            'expected': ';x=1024;y=768',
+        },
+        '{;x,y,empty}': {
+            'expansion': merge_dicts(x, y, empty),
+            'expected': ';x=1024;y=768;empty',
+        },
+    }
+
+    # Form-style query, ampersand-separated
+    level3_form_amp_examples = {
+        '{?x,y}': {
+            'expansion': merged_x_y,
+            'expected': '?x=1024&y=768',
+        },
+        '{?x,y,empty}': {
+            'expansion': merge_dicts(x, y, empty),
+            'expected': '?x=1024&y=768&empty=',
+        },
+    }
+
+    # Form-style query continuation
+    level3_form_cont_examples = {
+        '?fixed=yes{&x}': {
+            'expansion': x,
+            'expected': '?fixed=yes&x=1024',
+        },
+        '{&x,y,empty}': {
+            'expansion': merge_dicts(x, y, empty),
+            'expected': '&x=1024&y=768&empty=',
+        }
+    }
+
+    ## Level 4
+    # String expansion with value modifiers
+    level4_value_modifier_examples = {
+        '{var:3}': {
+            'expansion': var,
+            'expected': 'val',
+        },
+        '{var:30}': {
+            'expansion': var,
+            'expected': 'value',
+        },
+        '{list}': {
+            'expansion': list_ex,
+            'expected': 'red,green,blue',
+        },
+        '{list*}': {
+            'expansion': list_ex,
+            'expected': 'red,green,blue',
+        },
+        '{keys}': {
+            'expansion': keys,
+            'expected': 'semi,%3B,dot,.,comma,%2C',
+        },
+        '{keys*}': {
+            'expansion': keys,
+            'expected': 'semi=%3B,dot=.,comma=%2C',
+        },
+    }
+
+    # Reserved expansion with value modifiers
+    level4_reserved_examples = {
+        '{+path:6}/here': {
+            'expansion': path,
+            'expected': '/foo/b/here',
+        },
+        '{+list}': {
+            'expansion': list_ex,
+            'expected': 'red,green,blue',
+        },
+        '{+list*}': {
+            'expansion': list_ex,
+            'expected': 'red,green,blue',
+        },
+        '{+keys}': {
+            'expansion': keys,
+            'expected': 'semi,;,dot,.,comma,,',
+        },
+        '{+keys*}': {
+            'expansion': keys,
+            'expected': 'semi=;,dot=.,comma=,',
+        },
+    }
+
+    # Fragment expansion with value modifiers
+    level4_fragment_examples = {
+        '{#path:6}/here': {
+            'expansion': path,
+            'expected': '#/foo/b/here',
+        },
+        '{#list}': {
+            'expansion': list_ex,
+            'expected': '#red,green,blue',
+        },
+        '{#list*}': {
+            'expansion': list_ex,
+            'expected': '#red,green,blue',
+        },
+        '{#keys}': {
+            'expansion': keys,
+            'expected': '#semi,;,dot,.,comma,,'
+        },
+        '{#keys*}': {
+            'expansion': keys,
+            'expected': '#semi=;,dot=.,comma=,'
+        },
+    }
+
+    # Label expansion, dot-prefixed
+    level4_label_examples = {
+        'X{.var:3}': {
+            'expansion': var,
+            'expected': 'X.val',
+        },
+        'X{.list}': {
+            'expansion': list_ex,
+            'expected': 'X.red,green,blue',
+        },
+        'X{.list*}': {
+            'expansion': list_ex,
+            'expected': 'X.red.green.blue',
+        },
+        'X{.keys}': {
+            'expansion': keys,
+            'expected': 'X.semi,%3B,dot,.,comma,%2C',
+        },
+        'X{.keys*}': {
+            'expansion': keys,
+            'expected': 'X.semi=%3B.dot=..comma=%2C',
+        },
+    }
+
+    # Path segments, slash-prefixed
+    level4_path_slash_examples = {
+        '{/var:1,var}': {
+            'expansion': var,
+            'expected': '/v/value',
+        },
+        '{/list}': {
+            'expansion': list_ex,
+            'expected': '/red,green,blue',
+        },
+        '{/list*}': {
+            'expansion': list_ex,
+            'expected': '/red/green/blue',
+        },
+        '{/list*,path:4}': {
+            'expansion': merge_dicts(list_ex, path),
+            'expected': '/red/green/blue/%2Ffoo',
+        },
+        '{/keys}': {
+            'expansion': keys,
+            'expected': '/semi,%3B,dot,.,comma,%2C',
+        },
+        '{/keys*}': {
+            'expansion': keys,
+            'expected': '/semi=%3B/dot=./comma=%2C',
+        },
+    }
+
+    # Path-style parameters, semicolon-prefixed
+    level4_path_semi_examples = {
+        '{;hello:5}': {
+            'expansion': hello,
+            'expected': ';hello=Hello',
+        },
+        '{;list}': {
+            'expansion': list_ex,
+            'expected': ';list=red,green,blue',
+        },
+        '{;list*}': {
+            'expansion': list_ex,
+            'expected': ';list=red;list=green;list=blue',
+        },
+        '{;keys}': {
+            'expansion': keys,
+            'expected': ';keys=semi,%3B,dot,.,comma,%2C',
+        },
+        '{;keys*}': {
+            'expansion': keys,
+            'expected': ';semi=%3B;dot=.;comma=%2C',
+        },
+    }
+
+    # Form-style query, ampersand-separated
+    level4_form_amp_examples = {
+        '{?var:3}': {
+            'expansion': var,
+            'expected': '?var=val',
+        },
+        '{?list}': {
+            'expansion': list_ex,
+            'expected': '?list=red,green,blue',
+        },
+        '{?list*}': {
+            'expansion': list_ex,
+            'expected': '?list=red&list=green&list=blue',
+        },
+        '{?keys}': {
+            'expansion': keys,
+            'expected': '?keys=semi,%3B,dot,.,comma,%2C',
+        },
+        '{?keys*}': {
+            'expansion': keys,
+            'expected': '?semi=%3B&dot=.&comma=%2C',
+        },
+    }
+
+    # Form-style query continuation
+    level4_form_query_examples = {
+        '{&var:3}': {
+            'expansion': var,
+            'expected': '&var=val',
+        },
+        '{&list}': {
+            'expansion': list_ex,
+            'expected': '&list=red,green,blue',
+        },
+        '{&list*}': {
+            'expansion': list_ex,
+            'expected': '&list=red&list=green&list=blue',
+        },
+        '{&keys}': {
+            'expansion': keys,
+            'expected': '&keys=semi,%3B,dot,.,comma,%2C',
+        },
+        '{&keys*}': {
+            'expansion': keys,
+            'expected': '&semi=%3B&dot=.&comma=%2C',
+        },
+    }
+
+    def __new__(cls, name, bases, attrs):
+        def make_test(d):
+            def _test_(self):
+                for k, v in d.items():
+                    t = URITemplate(k)
+                    self.assertEqual(t.expand(v['expansion']), v['expected'])
+            return _test_
+
+        examples = [
+            (
+                n, getattr(RFCTemplateExamples, n)
+            ) for n in dir(RFCTemplateExamples) if n.startswith('level')
+        ]
+
+        for name, value in examples:
+            testname = 'test_%s' % name
+            attrs[testname] = make_test(value)
+
+        return type.__new__(cls, name, bases, attrs)
+
+
+class TestURITemplate(with_metaclass(RFCTemplateExamples, TestCase)):
     def test_no_variables_in_uri(self):
         """
         This test ensures that if there are no variables present, the
@@ -53,41 +436,6 @@ class TestURITemplate(TestCase):
     def test_hash(self):
         uri = 'https://api.github.com{/endpoint}'
         self.assertEqual(hash(URITemplate(uri)), hash(uri))
-
-    def test_level1_examples(self):
-        """
-        Level 1 examples from RFC 6570.
-        """
-        ex1 = '{var}'
-        t1 = URITemplate(ex1)
-        expected = value = 'value'
-        self.assertEqual(str(t1.variables[0]), 'var')
-        self.assertEqual(t1.expand(var=value), value)
-
-        ex2 = '{hello}'
-        t2 = URITemplate(ex2)
-        value = 'Hello World!'
-        expected = 'Hello%20World%21'
-        self.assertEqual(str(t2.variables[0]), 'hello')
-        self.assertEqual(t2.expand(hello=value), expected)
-
-
-class TestURIVariable(TestCase):
-    def test_level1_examples(self):
-        """
-        Level 1 examples from RFC 6570.
-        """
-        ex1 = 'var'
-        value = 'value'
-        expected = {ex1: value}
-        v1 = URIVariable(ex1)
-        self.assertEqual(v1.expand({ex1: value}), expected)
-
-        ex2 = 'hello'
-        value = 'Hello World!'
-        expected = {ex2: 'Hello%20World%21'}
-        v2 = URIVariable(ex2)
-        self.assertEqual(v2.expand({ex2: value}), expected)
 
 
 if __name__ == '__main__':
