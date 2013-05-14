@@ -3,8 +3,7 @@ uritemplate
 
 Documentation_ -- GitHub_ -- BitBucket_
 
-Simple python library to deal with `URI Templates`_. The API should looks 
-like::
+Simple python library to deal with `URI Templates`_. The API looks like::
 
     from uritemplate import URITemplate, expand
 
