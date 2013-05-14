@@ -84,8 +84,12 @@ class URITemplate(object):
             t.expand({'end': 'users'})
             t.expand(end='gists')
 
-        .. note:: Passing values by both parts, will override values in
-                  ``var_dict``.
+        .. note:: Passing values by both parts, may override values in
+                  ``var_dict``. For example::
+
+                      expand('https://{var}', {'var': 'val1'}, var='val2')
+
+                  ``val2`` will be used instead of ``val1``.
 
         """
         if not self.variables:

@@ -22,8 +22,12 @@ def expand(uri, var_dict=None, **kwargs):
         expand('https://api.github.com{/end}', {'end': 'users'})
         expand('https://api.github.com{/end}', end='gists')
 
-    .. note:: Passing values by both parts, will override values in
-              ``var_dict``.
+    .. note:: Passing values by both parts, may override values in
+              ``var_dict``. For example::
+
+                  expand('https://{var}', {'var': 'val1'}, var='val2')
+
+              ``val2`` will be used instead of ``val1``.
 
     """
     return URITemplate(uri).expand(var_dict, **kwargs)
