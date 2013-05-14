@@ -1,7 +1,7 @@
 uritemplate
 ===========
 
-Documentation_ -- GitHub_ -- BitBucket_
+Documentation_ -- GitHub_ -- BitBucket_ -- Travis-CI_
 
 Simple python library to deal with `URI Templates`_. The API looks like
 
@@ -41,14 +41,22 @@ Python, but object creation can consume a great deal of time and so can the
 ``re`` module which uritemplate relies on. Constructing the object once should 
 reduce the amount of time your code takes to run.
 
+Installing
+----------
+
+::
+
+    pip install uritemplate.py
+
 License
 -------
 
 Modified BSD license_
 
 
-.. _Documentation: https://uritemplate.rtfd.org/
+.. _Documentation: http://uritemplate.rtfd.org/
 .. _GitHub: https://github.com/sigmavirus24/uritemplate
 .. _BitBucket: https://bitbucket.org/icordasc/uritemplate
+.. _Travis-CI: https://travis-ci.org/sigmavirus24/uritemplate
 .. _URI Templates: http://tools.ietf.org/html/rfc6570
 .. _license: https://github.com/sigmavirus24/uritemplate/blob/master/LICENSE
