@@ -3,7 +3,9 @@ uritemplate
 
 Documentation_ -- GitHub_ -- BitBucket_
 
-Simple python library to deal with `URI Templates`_. The API looks like::
+Simple python library to deal with `URI Templates`_. The API looks like
+
+.. code-block:: python
 
     from uritemplate import URITemplate, expand
 
@@ -19,7 +21,9 @@ Simple python library to deal with `URI Templates`_. The API looks like::
     t.expand({'gist_id': 123456})
     print(expand(gist_uri, {'gist_id': 123456}))
 
-Where it might be useful to have a class::
+Where it might be useful to have a class
+
+.. code-block:: python
 
     import requests
 
@@ -47,4 +51,4 @@ Modified BSD license_
 .. _GitHub: https://github.com/sigmavirus24/uritemplate
 .. _BitBucket: https://bitbucket.org/icordasc/uritemplate
 .. _URI Templates: http://tools.ietf.org/html/rfc6570
-.. _license: ./LICENSE
+.. _license: https://github.com/sigmavirus24/uritemplate/blob/master/LICENSE
