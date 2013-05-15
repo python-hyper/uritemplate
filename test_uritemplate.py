@@ -1,6 +1,5 @@
 from unittest import TestCase, main
 from uritemplate import URITemplate, expand
-from six import with_metaclass
 
 
 def merge_dicts(*args):
@@ -386,7 +385,7 @@ class RFCTemplateExamples(type):
         return type.__new__(cls, name, bases, attrs)
 
 
-class TestURITemplate(with_metaclass(RFCTemplateExamples, TestCase)):
+class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
     def test_no_variables_in_uri(self):
         """
         This test ensures that if there are no variables present, the
