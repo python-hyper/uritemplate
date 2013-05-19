@@ -420,7 +420,7 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
         expanded = 'https://api.github.com/users/sigmavirus24'
         self.assertEqual(t.expand(user='sigmavirus24'), expanded)
         v = t.variables[0]
-        self.assertEqual(v.expand({'user': None}), {})
+        self.assertEqual(v.expand({'user': None}), {'/user': ''})
 
         # Multiple
         t = URITemplate('https://api.github.com/users{/user}{/repo}')

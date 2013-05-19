@@ -394,7 +394,7 @@ class URIVariable(object):
                 self.original: self.start + self.join_str.join(return_values)
             }
 
-        return {self.original: None}
+        return {self.original: ''}
 
 
 def is_list_of_tuples(value):
