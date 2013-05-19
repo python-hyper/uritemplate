@@ -57,10 +57,17 @@ class URITemplate(object):
     """
 
     def __init__(self, uri):
+        #: The original URI to be parsed.
         self.uri = uri
+        #: A list of the variables in the URI. They are stored as
+        #: :class:`URIVariable`\ s
         self.variables = [
             URIVariable(m.groups()[0]) for m in template_re.finditer(self.uri)
         ]
+        #: A set of variable names in the URI.
+        self.variable_names = set()
+        for variable in self.variables:
+            self.variable_names.update(variable.variable_names)
 
     def __repr__(self):
         return 'URITemplate(%s)' % self
@@ -127,7 +134,8 @@ class URIVariable(object):
         self.original = var
         self.operator = ''
         self.safe = ''
-        self.vars = []
+        self.variables = []
+        self.variable_names = []
         self.defaults = {}
         self.parse()
 
@@ -192,7 +200,11 @@ class URIVariable(object):
             if default_val:
                 self.defaults[name] = default_val
 
-            self.vars.append((name, {'explode': explode, 'prefix': prefix}))
+            self.variables.append(
+                (name, {'explode': explode, 'prefix': prefix})
+            )
+
+        self.variable_names = [name for (name, _) in self.variables]
 
     def _query_expansion(self, name, value, explode, prefix):
         """Expansion method for the '?' and '&' operators."""
@@ -354,7 +366,7 @@ class URIVariable(object):
         """
         return_values = []
 
-        for name, opts in self.vars:
+        for name, opts in self.variables:
             value = var_dict.get(name, None)
             if not value and value != '' and name in self.defaults:
                 value = self.defaults[name]
@@ -382,7 +394,7 @@ class URIVariable(object):
                 self.original: self.start + self.join_str.join(return_values)
             }
 
-        return {}
+        return {self.original: None}
 
 
 def is_list_of_tuples(value):
