@@ -54,5 +54,24 @@ API
 .. autoclass:: uritemplate.URITemplate
     :members:
 
-.. autoclass:: uritemplate.URIVariable
-    :members:
+Implementation Details
+----------------------
+
+Classes, their methods, and functions in this section are not part of the API 
+and as such are not meant to be used by users of ``uritemplate.py``. These are 
+documented here purely for reference as they are inadvertently exposed via the 
+public API.
+
+For example::
+
+    t = URITemplate('https://api.github.com/users{/user}')
+    t.variables
+    # => [URIVariable(/user)]
+
+Users can interact with :class:`URIVariable` objects as they see fit, but 
+their API may change and are not guaranteed to be consistent across versions.  
+Code relying on methods defined on :class:`URIVariable` and other classes, 
+methods, and functions in this section may break in future releases.
+
+.. autoclass:: uritemplate.template.URIVariable
+    :members: expand

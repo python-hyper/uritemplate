@@ -125,6 +125,13 @@ class URIVariable(object):
     object's ``__str__`` and ``__repr__`` methods do not return the same
     information. Calling ``str(var)`` will return the original variable.
 
+    This object does the majority of the heavy lifting. The ``URITemplate``
+    object finds the variables in the URI and then creates ``URIVariable``
+    objects.  Expansions of the URI are handled by each ``URIVariable``
+    object. ``URIVariable.expand()`` returns a dictionary of the original
+    variable and the expanded value. Check that method's documentation for
+    more information.
+
     """
 
     operators = ('+', '#', '.', '/', ';', '?', '&', '|', '!', '@')
@@ -214,7 +221,7 @@ class URIVariable(object):
         tuples, items = is_list_of_tuples(value)
 
         safe = self.safe
-        if isinstance(value, (list, tuple)) and not tuples:
+        if list_test(value) and not tuples:
             if explode:
                 return self.join_str.join(
                     '%s=%s' % (name, quote(v, safe)) for v in value
@@ -223,7 +230,7 @@ class URIVariable(object):
                 value = ','.join(quote(v, safe) for v in value)
                 return '%s=%s' % (name, value)
 
-        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
+        if dict_test(value) or tuples:
             items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
@@ -359,6 +366,26 @@ class URIVariable(object):
 
         Using ``var_dict`` and the previously parsed defaults, expand this
         variable and subvariables.
+
+        :param dict var_dict: dictionary of key-value pairs to be used during
+            expansion
+        :returns: dict(variable=value)
+
+        Examples::
+
+            # (1)
+            v = URIVariable('/var')
+            expansion = v.expand({'var': 'value'})
+            print(expansion)
+            # => {'/var': '/value'}
+
+            # (2)
+            v = URIVariable('?var,hello,x,y')
+            expansion = v.expand({'var': 'value', 'hello': 'Hello World!',
+                                  'x': '1024', 'y': '768'})
+            print(expansion)
+            # => {'?var,hello,x,y':
+            #     '?var=value&hello=Hello%20World%21&x=1024&y=768'}
 
         """
         return_values = []
