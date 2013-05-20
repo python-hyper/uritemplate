@@ -8,6 +8,8 @@ Changelog
 
 - If there is no value or default given, simply return an empty string
 
+- Fix sdist
+
 0.1.0 - 2013-05-14
 ------------------
 

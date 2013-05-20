@@ -211,7 +211,7 @@ class URIVariable(object):
         if value is None or (len(value) == 0 and value != ""):
             return None
 
-        tuples = is_list_of_tuples(value)
+        tuples, items = is_list_of_tuples(value)
 
         safe = self.safe
         if isinstance(value, (list, tuple)) and not tuples:
@@ -224,7 +224,7 @@ class URIVariable(object):
                 return '%s=%s' % (name, value)
 
         if isinstance(value, (dict, collections.MutableMapping)) or tuples:
-            items = value if tuples else sorted(value.items())
+            items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
                     '%s=%s' % (
@@ -256,9 +256,9 @@ class URIVariable(object):
         if value is None or (len(value) == 0 and value != ''):
             return None
 
-        tuples = is_list_of_tuples(value)
+        tuples, items = is_list_of_tuples(value)
 
-        if isinstance(value, (list, tuple)) and not tuples:
+        if list_test(value) and not tuples:
             if not explode:
                 join_str = ','
 
@@ -267,8 +267,8 @@ class URIVariable(object):
             )
             return expanded if expanded else None
 
-        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
-            items = value if tuples else sorted(value.items())
+        if dict_test(value) or tuples:
+            items = items or sorted(value.items())
             format_str = '%s=%s'
             if not explode:
                 format_str = '%s,%s'
@@ -295,9 +295,9 @@ class URIVariable(object):
         if self.operator == '?':
             join_str = '&'
 
-        tuples = is_list_of_tuples(value)
+        tuples, items = is_list_of_tuples(value)
 
-        if isinstance(value, (list, tuple)) and not tuples:
+        if list_test(value) and not tuples:
             if explode:
                 expanded = join_str.join(
                     '%s=%s' % (
@@ -309,8 +309,8 @@ class URIVariable(object):
                 value = ','.join(quote(v, safe) for v in value)
                 return '%s=%s' % (name, value)
 
-        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
-            items = value if tuples else sorted(value.items())
+        if dict_test(value) or tuples:
+            items = items or sorted(value.items())
 
             if explode:
                 return join_str.join(
@@ -336,17 +336,14 @@ class URIVariable(object):
         if value is None:
             return None
 
-        tuples = is_list_of_tuples(value)
+        tuples, items = is_list_of_tuples(value)
 
-        if isinstance(value, (list, tuple)) and not tuples:
+        if list_test(value) and not tuples:
             return ','.join(quote(v, self.safe) for v in value)
 
-        if isinstance(value, (dict, collections.MutableMapping)) or tuples:
-            items = value if tuples else sorted(value.items())
-            if explode:
-                format_str = '%s=%s'
-            else:
-                format_str = '%s,%s'
+        if dict_test(value) or tuples:
+            items = items or sorted(value.items())
+            format_str = '%s=%s' if explode else '%s,%s'
 
             return ','.join(
                 format_str % (
@@ -399,11 +396,19 @@ class URIVariable(object):
 
 def is_list_of_tuples(value):
     if not isinstance(value, (list, tuple)):
-        return False
+        return False, None
 
     try:
         dict(value)
     except:
-        return False
+        return False, None
     else:
-        return True
+        return True, value
+
+
+def list_test(value):
+    return isinstance(value, (list, tuple))
+
+
+def dict_test(value):
+    return isinstance(value, (dict, collections.MutableMapping))
