@@ -53,3 +53,6 @@ API
 
 .. autoclass:: uritemplate.URITemplate
     :members:
+
+.. autoclass:: uritemplate.URIVariable
+    :members:
