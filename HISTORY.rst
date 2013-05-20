@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.1 - 2013-05-xx
+0.1.1 - 2013-05-19
 ------------------
 
 - Add ability to get set of variable names in the current URI
