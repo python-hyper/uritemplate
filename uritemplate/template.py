@@ -70,7 +70,7 @@ class URITemplate(object):
             self.variable_names.update(variable.variable_names)
 
     def __repr__(self):
-        return 'URITemplate(%s)' % self
+        return 'URITemplate("%s")' % self
 
     def __str__(self):
         return self.uri
