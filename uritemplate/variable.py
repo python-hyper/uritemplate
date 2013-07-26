@@ -120,6 +120,7 @@ class URIVariable(object):
         After parsing the variable, we need to set up these attributes and it
         only makes sense to do it in a more easily testable way.
         """
+        self.safe = ''
         self.start = self.join_str = self.operator
         if self.operator == '+':
             self.start = ''

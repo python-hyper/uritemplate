@@ -493,8 +493,39 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
 
 
 class TestURIVariable(TestCase):
+    def setUp(self):
+        self.v = URIVariable('{foo}')
+
     def test_post_parse(self):
-        v = URIVariable('{foo}')
+        v = self.v
+        self.assertEqual(v.join_str, ',')
+        self.assertEqual(v.operator, '')
+        self.assertEqual(v.safe, '')
+        self.assertEqual(v.start, '')
+
+    def test_post_parse_plus(self):
+        v = self.v
+        v.operator = '+'
+        v.post_parse()
+        self.assertEqual(v.join_str, ',')
+        self.assertEqual(v.safe, URIVariable.reserved)
+        self.assertEqual(v.start, '')
+
+    def test_post_parse_octothorpe(self):
+        v = self.v
+        v.operator = '#'
+        v.post_parse()
+        self.assertEqual(v.join_str, ',')
+        self.assertEqual(v.safe, URIVariable.reserved)
+        self.assertEqual(v.start, '#')
+
+    def test_post_parse_question(self):
+        v = self.v
+        v.operator = '?'
+        v.post_parse()
+        self.assertEqual(v.join_str, '&')
+        self.assertEqual(v.safe, '')
+        self.assertEqual(v.start, '?')
 
 
 class TestAPI(TestCase):
