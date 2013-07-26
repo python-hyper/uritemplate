@@ -16,7 +16,6 @@ What do you do?
 """
 
 import re
-import collections
 from uritemplate.variable import URIVariable
 
 template_re = re.compile('{([^\}]+)}')

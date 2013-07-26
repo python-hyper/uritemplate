@@ -436,7 +436,7 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
         t = URITemplate(uri)
         self.assertEqual(str(t), uri)
         self.assertEqual(str(t.variables[0]), '/endpoint')
-        self.assertEqual(repr(t), 'URITemplate(%s)' % uri)
+        self.assertEqual(repr(t), 'URITemplate("%s")' % uri)
         self.assertEqual(repr(t.variables[0]), 'URIVariable(/endpoint)')
 
     def test_hash(self):

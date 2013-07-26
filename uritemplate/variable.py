@@ -20,6 +20,7 @@ try:
 except ImportError:
     # python 3
     from urllib.parse import quote
+import collections
 
 
 class URIVariable(object):
