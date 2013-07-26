@@ -1,6 +1,6 @@
 from unittest import TestCase, main
 from uritemplate import URITemplate, expand
-from uritemplate.variable import URIVariable
+from uritemplate import variable
 
 
 def merge_dicts(*args):
@@ -494,7 +494,7 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
 
 class TestURIVariable(TestCase):
     def setUp(self):
-        self.v = URIVariable('{foo}')
+        self.v = variable.URIVariable('{foo}')
 
     def test_post_parse(self):
         v = self.v
@@ -508,7 +508,7 @@ class TestURIVariable(TestCase):
         v.operator = '+'
         v.post_parse()
         self.assertEqual(v.join_str, ',')
-        self.assertEqual(v.safe, URIVariable.reserved)
+        self.assertEqual(v.safe, variable.URIVariable.reserved)
         self.assertEqual(v.start, '')
 
     def test_post_parse_octothorpe(self):
@@ -516,7 +516,7 @@ class TestURIVariable(TestCase):
         v.operator = '#'
         v.post_parse()
         self.assertEqual(v.join_str, ',')
-        self.assertEqual(v.safe, URIVariable.reserved)
+        self.assertEqual(v.safe, variable.URIVariable.reserved)
         self.assertEqual(v.start, '#')
 
     def test_post_parse_question(self):
@@ -534,6 +534,29 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.join_str, '&')
         self.assertEqual(v.safe, '')
         self.assertEqual(v.start, '&')
+
+
+class TestVariableModule(TestCase):
+    def test_is_list_of_tuples(self):
+        l = [(1, 2), (3, 4)]
+        self.assertEqual(variable.is_list_of_tuples(l), (True, l))
+
+        l = [1, 2, 3, 4]
+        self.assertEqual(variable.is_list_of_tuples(l), (False, None))
+
+    def test_list_test(self):
+        l = [1, 2, 3, 4]
+        self.assertEqual(variable.list_test(l), True)
+
+        l = str([1, 2, 3, 4])
+        self.assertEqual(variable.list_test(l), False)
+
+    def test_list_test(self):
+        l = [(1, 2), (3, 4)]
+        self.assertEqual(variable.dict_test(l), False)
+
+        d = dict(l)
+        self.assertEqual(variable.dict_test(d), True)
 
 
 class TestAPI(TestCase):
