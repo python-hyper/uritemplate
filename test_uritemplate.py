@@ -1,5 +1,6 @@
 from unittest import TestCase, main
 from uritemplate import URITemplate, expand
+from uritemplate.variable import URIVariable
 
 
 def merge_dicts(*args):
@@ -489,6 +490,11 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
         d = {t: 1}
         d[u] += 1
         self.assertEqual(d, {t: 2})
+
+
+class TestURIVariable(TestCase):
+    def test_post_parse(self):
+        v = URIVariable('{foo}')
 
 
 class TestAPI(TestCase):
