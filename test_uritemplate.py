@@ -483,6 +483,13 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
             None
         )
 
+    def test_hashability(self):
+        t = URITemplate('{foo}')
+        u = URITemplate('{foo}')
+        d = {t: 1}
+        d[u] += 1
+        self.assertEqual(d, {t: 2})
+
 
 class TestAPI(TestCase):
     uri = 'https://api.github.com{/endpoint}'
