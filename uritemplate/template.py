@@ -75,6 +75,9 @@ class URITemplate(object):
     def __str__(self):
         return self.uri
 
+    def __eq__(self, other):
+        return self.uri == other.uri
+
     def __hash__(self):
         return hash(self.uri)
 
