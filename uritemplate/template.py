@@ -141,12 +141,19 @@ class URIVariable(object):
     reserved = ":/?#[]@!$&'()*+,;="
 
     def __init__(self, var):
+        #: The original string that comes through with the variable
         self.original = var
+        #: The operator for the variable
         self.operator = ''
+        #: List of safe characters when quoting the string
         self.safe = ''
+        #: List of variables in this variable
         self.variables = []
+        #: List of variable names
         self.variable_names = []
+        #: List of defaults passed in
         self.defaults = {}
+        # Parse the variable itself.
         self.parse()
 
         self.start = self.join_str = self.operator
