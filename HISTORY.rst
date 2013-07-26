@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.0 - 2013-07-26
+------------------
+
+- Refactor the library a bit and add more tests.
+
+- Backwards incompatible with 0.1.x if using ``URIVariable`` directly from
+  ``uritemplate.template``
+
 0.1.1 - 2013-05-19
 ------------------
 
