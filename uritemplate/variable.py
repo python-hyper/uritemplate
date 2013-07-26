@@ -131,8 +131,6 @@ class URIVariable(object):
         if self.operator == '?':
             self.start = '?'
             self.join_str = '&'
-        if self.operator == '&':
-            self.start = self.join_str = '&'
 
         if self.operator in ('+', '#'):
             self.safe = URIVariable.reserved

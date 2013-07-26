@@ -527,6 +527,14 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.safe, '')
         self.assertEqual(v.start, '?')
 
+    def test_post_parse_ampersand(self):
+        v = self.v
+        v.operator = '&'
+        v.post_parse()
+        self.assertEqual(v.join_str, '&')
+        self.assertEqual(v.safe, '')
+        self.assertEqual(v.start, '&')
+
 
 class TestAPI(TestCase):
     uri = 'https://api.github.com{/endpoint}'
