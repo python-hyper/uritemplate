@@ -16,9 +16,13 @@ What do you do?
 """
 
 import re
+import sys
 from uritemplate.variable import URIVariable
 
 template_re = re.compile('{([^\}]+)}')
+
+if sys.version_info[0] == 3:
+    basestring = (str, bytes)
 
 
 class URITemplate(object):
@@ -105,6 +109,10 @@ class URITemplate(object):
 
         expansion = var_dict or {}
         expansion.update(kwargs)
+        for (k, v) in expansion.items():
+            if not isinstance(v, basestring):
+                expansion[k] = str(v)
+
         expanded = {}
         for v in self.variables:
             expanded.update(v.expand(expansion))
