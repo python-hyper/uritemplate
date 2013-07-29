@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.1 - 2013-07-28
+------------------
+
+- Convert non-string-like expansion values to strings for expansion. This is a
+  backwards compatible change.
+
 0.2.0 - 2013-07-26
 ------------------
 
