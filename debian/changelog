@@ -1,3 +1,9 @@
+uritemplate.py (0.2.0-2) quantal; urgency=low
+
+  * ctually working package this time
+
+ -- Dennis Kaarsemaker <dennis@kaarsemaker.net>  Sun, 13 Oct 2013 22:10:10 +0200
+
 uritemplate.py (0.2.0-1) quantal; urgency=low
 
   * Initial release

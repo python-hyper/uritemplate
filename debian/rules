@@ -23,12 +23,12 @@ override_dh_auto_clean:
 override_dh_auto_install:
 	set -ex; \
 	for python in $(PYVERS); do \
-		$$python setup.py install --skip-build --root debian/python-uritemplate \
+		$$python setup.py install --skip-build --root debian/python-uritemplate.py \
 			--install-layout deb; \
 	done
 
 	set -ex; \
 	for python in $(PY3VERS); do \
-		$$python setup.py install --skip-build --root debian/python3-uritemplate \
+		$$python setup.py install --skip-build --root debian/python3-uritemplate.py \
 			--install-layout deb; \
 	done
