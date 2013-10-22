@@ -79,6 +79,27 @@ class URITemplate(object):
     def __hash__(self):
         return hash(self.uri)
 
+    def _expand(self, var_dict, replace):
+        if not self.variables:
+            return self.uri
+
+        expansion = var_dict
+        expanded = {}
+        for v in self.variables:
+            expanded.update(v.expand(expansion))
+
+        def replace_all(match):
+            return expanded.get(match.groups()[0], '')
+
+        def replace_partial(match):
+            match = match.groups()[0]
+            var = '{%s}' % match
+            return expanded.get(match) or var
+
+        replace = replace_partial if replace else replace_all
+
+        return template_re.sub(replace, self.uri)
+
     def expand(self, var_dict=None, **kwargs):
         """Expand the template with the given parameters.
 
@@ -100,16 +121,28 @@ class URITemplate(object):
                   ``val2`` will be used instead of ``val1``.
 
         """
-        if not self.variables:
-            return self.uri
+        var_dict = var_dict or {}
+        var_dict.update(kwargs)
 
-        expansion = var_dict or {}
-        expansion.update(kwargs)
-        expanded = {}
-        for v in self.variables:
-            expanded.update(v.expand(expansion))
+        return self._expand(var_dict, False)
 
-        def replace(match):
-            return expanded.get(match.groups()[0], '')
+    def partial(self, var_dict=None, **kwargs):
+        """Partially expand the template with the given parameters.
 
-        return template_re.sub(replace, self.uri)
+        If all of the parameters for the template are not given, return a
+        partially expanded template.
+
+        :param dict var_dict: Optional dictionary with variables and values
+        :param kwargs: Alternative way to pass arguments
+        :returns: str
+
+        Example::
+
+            t = URITemplate('https://api.github.com{/end}')
+            t.partial()  # => URITemplate('https://api.github.com{/end}')
+
+        """
+        var_dict = var_dict or {}
+        var_dict.update(kwargs)
+
+        return URITemplate(self._expand(var_dict, True))
