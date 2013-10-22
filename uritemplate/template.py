@@ -134,7 +134,7 @@ class URITemplate(object):
 
         :param dict var_dict: Optional dictionary with variables and values
         :param kwargs: Alternative way to pass arguments
-        :returns: str
+        :returns: :class:`URITemplate`
 
         Example::
 
