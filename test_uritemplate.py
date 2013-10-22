@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from uritemplate import URITemplate, expand
+from uritemplate import URITemplate, expand, partial
 from uritemplate import variable
 
 
