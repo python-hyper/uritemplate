@@ -51,6 +51,8 @@ API
 
 .. autofunction:: uritemplate.expand
 
+.. autofunction:: uritemplate.partial
+
 .. autoclass:: uritemplate.URITemplate
     :members:
 
