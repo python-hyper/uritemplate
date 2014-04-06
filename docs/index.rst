@@ -74,4 +74,4 @@ Code relying on methods defined on :class:`URIVariable` and other classes,
 methods, and functions in this section may break in future releases.
 
 .. autoclass:: uritemplate.template.URIVariable
-    :members: original, operator, safe, variables, expand
+    :members: expand

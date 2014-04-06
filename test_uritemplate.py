@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from uritemplate import URITemplate, expand
+from uritemplate import URITemplate, expand, partial
 from uritemplate import variable
 
 
@@ -551,7 +551,7 @@ class TestVariableModule(TestCase):
         l = str([1, 2, 3, 4])
         self.assertEqual(variable.list_test(l), False)
 
-    def test_list_test(self):
+    def test_list_of_tuples_test(self):
         l = [(1, 2), (3, 4)]
         self.assertEqual(variable.dict_test(l), False)
 
@@ -565,6 +565,14 @@ class TestAPI(TestCase):
     def test_expand(self):
         self.assertEqual(expand(self.uri, {'endpoint': 'users'}),
                          'https://api.github.com/users')
+
+    def test_partial(self):
+        self.assertEqual(partial(self.uri), URITemplate(self.uri))
+        uri = self.uri + '/sigmavirus24{/other}'
+        self.assertEqual(
+            partial(uri, endpoint='users'),
+            URITemplate('https://api.github.com/users/sigmavirus24{/other}')
+            )
 
 
 if __name__ == '__main__':

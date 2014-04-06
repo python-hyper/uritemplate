@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.0 - 2013-10-22
+------------------
+
+- Add ``#partial`` to partially expand templates and return new instances of 
+  ``URITemplate``.
+
 0.2.0 - 2013-07-26
 ------------------
 
