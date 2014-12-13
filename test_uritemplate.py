@@ -491,6 +491,12 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
         d[u] += 1
         self.assertEqual(d, {t: 2})
 
+    def test_no_mutate(self):
+        args = {}
+        t = URITemplate('')
+        t.expand(args, key=1)
+        self.assertEqual(args, {})
+
 
 class TestURIVariable(TestCase):
     def setUp(self):

@@ -21,6 +21,10 @@ from uritemplate.variable import URIVariable
 template_re = re.compile('{([^\}]+)}')
 
 
+def _update(kwargs, var_dict):
+    kwargs.update((k, v) for k, v in var_dict.items() if k not in kwargs)
+
+
 class URITemplate(object):
 
     """This parses the template and will be used to expand it.
@@ -121,7 +125,8 @@ class URITemplate(object):
                   ``val2`` will be used instead of ``val1``.
 
         """
-        kwargs.update(var_dict or {})
+        if var_dict:
+            _update(kwargs, var_dict)
 
         return self._expand(kwargs, False)
 
@@ -141,6 +146,7 @@ class URITemplate(object):
             t.partial()  # => URITemplate('https://api.github.com{/end}')
 
         """
-        kwargs.update(var_dict or {})
+        if var_dict:
+            _update(kwargs, var_dict)
 
         return URITemplate(self._expand(kwargs, True))
