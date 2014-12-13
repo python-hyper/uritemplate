@@ -121,10 +121,9 @@ class URITemplate(object):
                   ``val2`` will be used instead of ``val1``.
 
         """
-        var_dict = var_dict or {}
-        var_dict.update(kwargs)
+        kwargs.update(var_dict or {})
 
-        return self._expand(var_dict, False)
+        return self._expand(kwargs, False)
 
     def partial(self, var_dict=None, **kwargs):
         """Partially expand the template with the given parameters.
@@ -142,7 +141,6 @@ class URITemplate(object):
             t.partial()  # => URITemplate('https://api.github.com{/end}')
 
         """
-        var_dict = var_dict or {}
-        var_dict.update(kwargs)
+        kwargs.update(var_dict or {})
 
-        return URITemplate(self._expand(var_dict, True))
+        return URITemplate(self._expand(kwargs, True))
