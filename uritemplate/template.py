@@ -23,10 +23,9 @@ template_re = re.compile('{([^\}]+)}')
 
 def _merge(var_dict, overrides):
     if var_dict:
-        for k, v in var_dict.items():
-            if k in overrides:
-                continue
-            overrides[k] = v
+        opts = var_dict.copy()
+        opts.update(overrides)
+        return opts
     return overrides
 
 
