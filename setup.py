@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 import os
 
@@ -7,7 +5,7 @@ packages = [
     'uritemplate'
 ]
 
-from distutils.core import setup
+from setuptools import setup
 
 if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
@@ -39,6 +37,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
 )
