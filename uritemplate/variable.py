@@ -112,7 +112,7 @@ class URIVariable(object):
                 (name, {'explode': explode, 'prefix': prefix})
             )
 
-        self.variable_names = [name for (name, _) in self.variables]
+        self.variable_names = [varname for (varname, _) in self.variables]
 
     def post_parse(self):
         """Set ``start``, ``join_str`` and ``safe`` attributes.
