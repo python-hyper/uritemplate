@@ -48,10 +48,10 @@ def python_safe_name(s):
 def make_test(test_name, template, variables, expected):
     def json_test_function(self):
         actual = unicode(expand(template, variables))
-        msg = '%(template)r did not expand as expected, got %(actual)r.'\
-                % locals()
-        if type(expected) == type([]):
-            self.assertTrue (actual in expected, msg)
+        msg = ('%(template)r did not expand as expected, got %(actual)r.' %
+               locals())
+        if isinstance(expected, list):
+            self.assertTrue(actual in expected, msg)
         else:
             self.assertEqual(expected, actual)
     json_test_function.__name__ = test_name
@@ -77,7 +77,7 @@ def build_tests_from_json(data_set, test_class=TestJSONFromUritemplatePy):
             template = testcase[0]
             expected = testcase[1]
             # closure on the test params
-            test_method = make_test(safe_name , template, variables, expected)
+            test_method = make_test(safe_name, template, variables, expected)
             # attach that method to the class
             setattr(test_class, safe_name, test_method)
 
@@ -185,7 +185,6 @@ class TestVariablesFromUritemplatePy(TestCase):
         template = 'http://{.a,b}{/b,c}/{c,d}'
         vrs = set(self.get_vars(template))
         self.assertEquals(set(['a', 'b', 'c', 'd']), vrs)
-
 
 
 if __name__ == '__main__':
