@@ -1,5 +1,6 @@
 import json
 import os.path
+import sys
 
 import pytest
 
@@ -114,6 +115,8 @@ class TestExtendedTests(FixtureMixin):
         """Check Additional Examples 3."""
         self._test('Additional Examples 3: Empty Variables')
 
+    @pytest.mark.xfail(sys.version_info < (3, 0),
+                       reason='See bug #19')
     def test_additional_examples_4(self):
         """Check Additional Examples 4."""
         self._test('Additional Examples 4: Numeric Keys')
