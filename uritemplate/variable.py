@@ -137,13 +137,15 @@ class URIVariable(object):
 
     def _query_expansion(self, name, value, explode, prefix):
         """Expansion method for the '?' and '&' operators."""
-        if value is None or (len(value) == 0 and value != ""):
+        if value is None:
             return None
 
         tuples, items = is_list_of_tuples(value)
 
         safe = self.safe
         if list_test(value) and not tuples:
+            if not value:
+                return None
             if explode:
                 return self.join_str.join(
                     '%s=%s' % (name, quote(v, safe)) for v in value
@@ -153,6 +155,8 @@ class URIVariable(object):
                 return '%s=%s' % (name, value)
 
         if dict_test(value) or tuples:
+            if not value:
+                return None
             items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
@@ -170,7 +174,7 @@ class URIVariable(object):
 
         if value:
             value = value[:prefix] if prefix else value
-            return '%s=%s' % (name, quote(value, safe))
+            return '%s=%s' % (name, quote(str(value), safe))
         return name + '='
 
     def _label_path_expansion(self, name, value, explode, prefix):
@@ -342,14 +346,11 @@ class URIVariable(object):
 
 
 def is_list_of_tuples(value):
-    if not isinstance(value, (list, tuple)):
+    if not value or not isinstance(value, (list, tuple)) or \
+            not all(isinstance(t, tuple) and len(t) == 2 for t in value):
         return False, None
 
-    try:
-        dict(value)
-        return True, value
-    except:
-        return False, None
+    return True, value
 
 
 def list_test(value):

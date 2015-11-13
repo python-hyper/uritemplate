@@ -102,7 +102,6 @@ class TestSpecExamplesByRFCSection(FixtureMixin):
 class TestExtendedTests(FixtureMixin):
     examples = load_examples('extended-tests')
 
-    @pytest.mark.xfail(reason='See bug #17')
     def test_additional_examples_1(self):
         """Check Additional Examples 1."""
         self._test('Additional Examples 1')
