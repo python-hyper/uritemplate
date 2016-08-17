@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.0.0 - 2016-08-17
+------------------
+
+- Fix handling of Unicode values on Python 2.6 and 2.7 for urllib.quote.
+
+- Confirm public stable API via version number.
+
 0.3.0 - 2013-10-22
 ------------------
 
