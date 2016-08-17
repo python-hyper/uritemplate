@@ -1,17 +1,10 @@
-import sys
-import os
+from setuptools import setup
+
+from uritemplate import __version__
 
 packages = [
     'uritemplate'
 ]
-
-from setuptools import setup
-
-if sys.argv[-1] in ("submit", "publish"):
-    os.system("python setup.py sdist upload")
-    sys.exit()
-
-from uritemplate import __version__
 
 setup(
     name="uritemplate.py",
