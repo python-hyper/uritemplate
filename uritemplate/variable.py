@@ -15,12 +15,13 @@ What do you do?
 
 """
 
-try:
-    from urllib import quote
-except ImportError:
-    # python 3
-    from urllib.parse import quote
 import collections
+import sys
+
+if (2, 6) <= sys.version_info < (2, 8):
+    import urllib
+elif (3, 3) <= sys.version_info < (4, 0):
+    import urllib.parse as urllib
 
 
 class URIVariable(object):
@@ -174,7 +175,7 @@ class URIVariable(object):
 
         if value:
             value = value[:prefix] if prefix else value
-            return '%s=%s' % (name, quote(str(value), safe))
+            return '%s=%s' % (name, quote(value, safe))
         return name + '='
 
     def _label_path_expansion(self, name, value, explode, prefix):
@@ -360,3 +361,24 @@ def list_test(value):
 
 def dict_test(value):
     return isinstance(value, (dict, collections.MutableMapping))
+
+
+try:
+    texttype = unicode
+except NameError:  # Python 3
+    texttype = str
+
+stringlikes = (texttype, bytes)
+
+
+def _encode(value, encoding='utf-8'):
+    if (isinstance(value, texttype) and
+            getattr(value, 'encode', None) is not None):
+        return value.encode(encoding)
+    return value
+
+
+def quote(value, safe):
+    if not isinstance(value, stringlikes):
+        value = str(value)
+    return urllib.quote(_encode(value), safe)
