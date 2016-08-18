@@ -12,7 +12,7 @@ setup(
     description='URI templates',
     long_description="\n\n".join([open("README.rst").read(),
                                   open("HISTORY.rst").read()]),
-    license=open('LICENSE').read(),
+    license="BSD 3-Clause License",
     author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
     url="https://uritemplate.readthedocs.org",
@@ -22,6 +22,7 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved',
+        'License :: OSI Approved :: BSD License',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
