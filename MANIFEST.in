@@ -1,6 +1,8 @@
 include README.rst
 include HISTORY.rst
 include LICENSE
+include LICENSE.APACHE
+include LICENSE.BSD
 include AUTHORS.rst
 
 recursive-include docs *
