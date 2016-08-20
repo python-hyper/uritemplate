@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.0.0 - 2016-08-20
+------------------
+
+- Relicense uritemplate.py as Apache 2 and BSD (See
+  https://github.com/sigmavirus24/uritemplate/pull/23)
+
 1.0.1 - 2016-08-18
 ------------------
 
