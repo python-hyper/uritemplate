@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from uritemplate import URITemplate, expand, partial
+from uritemplate import URITemplate, expand, partial, variables
 from uritemplate import variable
 
 
@@ -579,6 +579,10 @@ class TestAPI(TestCase):
             partial(uri, endpoint='users'),
             URITemplate('https://api.github.com/users/sigmavirus24{/other}')
             )
+
+    def test_variables(self):
+        self.assertEqual(variables(self.uri),
+                         URITemplate(self.uri).variable_names)
 
 
 if __name__ == '__main__':
