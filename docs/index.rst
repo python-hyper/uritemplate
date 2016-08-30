@@ -53,6 +53,8 @@ API
 
 .. autofunction:: uritemplate.partial
 
+.. autofunction:: uritemplate.variables
+
 .. autoclass:: uritemplate.URITemplate
     :members:
 

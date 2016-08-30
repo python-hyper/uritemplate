@@ -1,5 +1,14 @@
-Changelog
-=========
+Changelog - uritemplate
+=======================
+
+2.0.0 - 2016-08-29
+------------------
+
+- Merge uritemplate.py into uritemplate
+
+
+Changelog - uritemplate.py
+==========================
 
 2.0.0 - 2016-08-20
 ------------------

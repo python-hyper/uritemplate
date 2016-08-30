@@ -7,7 +7,7 @@ packages = [
 ]
 
 setup(
-    name="uritemplate.py",
+    name="uritemplate",
     version=__version__,
     description='URI templates',
     long_description="\n\n".join([open("README.rst").read(),

@@ -50,3 +50,22 @@ def partial(uri, var_dict=None, **kwargs):
 
     """
     return URITemplate(uri).partial(var_dict, **kwargs)
+
+
+def variables(uri):
+    """Parse the variables of the template.
+
+    This returns all of the variable names in the URI Template.
+
+    :returns: Set of variable names
+    :rtype: set
+
+    Example::
+
+        variables('https://api.github.com{/end})
+        # => {'end'}
+        variables('https://api.github.com/repos{/username}{/repository}')
+        # => {'username', 'repository'}
+
+    """
+    return set(URITemplate(uri).variable_names)
