@@ -10,6 +10,12 @@ Changelog - uritemplate
 Changelog - uritemplate.py
 ==========================
 
+3.0.1 - 2015-08-29
+------------------
+
+- Deprecate in favor of uritemplate. This package is now a metapackage that
+  depends on uritemplate.
+
 2.0.0 - 2016-08-20
 ------------------
 
