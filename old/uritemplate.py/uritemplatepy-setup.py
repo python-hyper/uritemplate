@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="uritemplate.py",
-    version="3.0.1",
+    version="3.0.2",
     description="URI templates",
     long_description="\n\n".join([open("README.rst").read(),
                                   open("HISTORY.rst").read()]),
@@ -10,7 +10,7 @@ setup(
     author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
     url="https://uritemplate.readthedocs.org",
-    install_requires=["uritemplate.py>=2.0"],
+    install_requires=["uritemplate>=2.0"],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved',

@@ -10,6 +10,11 @@ Changelog - uritemplate
 Changelog - uritemplate.py
 ==========================
 
+3.0.2 - 2015-08-30
+------------------
+
+- Fix meta-package requirements.
+
 3.0.1 - 2015-08-29
 ------------------
 
