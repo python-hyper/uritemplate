@@ -48,7 +48,7 @@ Installing
 
 ::
 
-    pip install uritemplate.py
+    pip install uritemplate
 
 License
 -------
