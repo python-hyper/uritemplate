@@ -1,0 +1,23 @@
+Source: uritemplate.py
+Maintainer: Dennis Kaarsemaker <dennis@kaarsemaker.net>
+Section: python
+Priority: optional
+Build-Depends: debhelper, python-all, python-setuptools, python3-all
+Standards-Version: 3.9.3
+X-Python-Version: >= 2.6
+X-Python3-Version: >= 3.0
+Homepage: http://uritemplatepy.readthedocs.org/
+
+Package: python-uritemplate.py
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Simple python library to deal with URI Templates.
+ Simple python library to deal with URI Templates.
+
+Package: python3-uritemplate.py
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}
+Description: Simple python library to deal with URI Templates.
+ Simple python library to deal with URI Templates.
+ .
+ This package contains the Python 3 version of the library.
