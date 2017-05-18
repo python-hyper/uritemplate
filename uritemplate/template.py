@@ -18,7 +18,7 @@ What do you do?
 import re
 from uritemplate.variable import URIVariable
 
-template_re = re.compile('{([^\}]+)}')
+template_re = re.compile('{([^}]+)}')
 
 
 def _merge(var_dict, overrides):
