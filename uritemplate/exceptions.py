@@ -10,7 +10,7 @@ class TemplateException(Exception):
 class InvalidTemplate(TemplateException):
     """Base class for template validation."""
 
-    message = "The URI template ({}) is invalid."
+    message = "The URI template ({0}) is invalid."
 
     def __init__(self, uri, *args):
         """Initialize our exception."""
@@ -21,7 +21,7 @@ class InvalidTemplate(TemplateException):
 class UnbalancedBraces(InvalidTemplate):
     """The template has unbalanced braces."""
 
-    message = "The URI template ({}) has more {} braces than {} braces."
+    message = "The URI template ({0}) has more {1} braces than {2} braces."
 
     def __init__(self, uri, left_braces_count, right_braces_count):
         """Initialize our exception."""
