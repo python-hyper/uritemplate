@@ -1,7 +1,7 @@
 uritemplate
 ===========
 
-Documentation_ -- GitHub_ -- BitBucket_ -- Travis-CI_
+Documentation_ -- GitHub_ -- Travis-CI_
 
 Simple python library to deal with `URI Templates`_. The API looks like
 
@@ -56,9 +56,8 @@ License
 Modified BSD license_
 
 
-.. _Documentation: http://uritemplate.rtfd.org/
-.. _GitHub: https://github.com/sigmavirus24/uritemplate
-.. _BitBucket: https://bitbucket.org/icordasc/uritemplate
-.. _Travis-CI: https://travis-ci.org/sigmavirus24/uritemplate
+.. _Documentation: https://uritemplate.readthedocs.io/
+.. _GitHub: https://github.com/python-hyper/uritemplate
+.. _Travis-CI: https://travis-ci.org/python-hyper/uritemplate
 .. _URI Templates: http://tools.ietf.org/html/rfc6570
-.. _license: https://github.com/sigmavirus24/uritemplate/blob/master/LICENSE
+.. _license: https://github.com/python-hyper/uritemplate/blob/master/LICENSE
