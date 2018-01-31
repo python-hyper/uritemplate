@@ -1,25 +1,28 @@
-# From: https://github.com/ActiveState/code/blob/master/recipes/Python/576696_OrderedSet_with_Weakrefs/
+# From: https://github.com/ActiveState/code/blob/master/recipes/Python/576696_OrderedSet_with_Weakrefs/  # noqa
 
 import collections
 from weakref import proxy
 
+
 class Link(object):
     __slots__ = 'prev', 'next', 'key', '__weakref__'
+
 
 class OrderedSet(collections.MutableSet):
     'Set the remembers the order elements were added'
     # Big-O running times for all methods are the same as for regular sets.
-    # The internal self.__map dictionary maps keys to links in a doubly linked list.
-    # The circular doubly linked list starts and ends with a sentinel element.
-    # The sentinel element never gets deleted (this simplifies the algorithm).
-    # The prev/next links are weakref proxies (to prevent circular references).
-    # Individual links are kept alive by the hard reference in self.__map.
-    # Those hard references disappear when a key is deleted from an OrderedSet.
+    # The internal self.__map dictionary maps keys to links in a doubly linked
+    # list. The circular doubly linked list starts and ends with a sentinel
+    # element. The sentinel element never gets deleted (this simplifies the
+    # algorithm). The prev/next links are weakref proxies (to prevent circular
+    # references). Individual links are kept alive by the hard reference in
+    # self.__map. Those hard references disappear when a key is deleted from
+    # an OrderedSet.
 
     def __init__(self, iterable=None):
-        self.__root = root = Link()         # sentinel node for doubly linked list
+        self.__root = root = Link()  # sentinel node for doubly linked list
         root.prev = root.next = root
-        self.__map = {}                     # key --> link
+        self.__map = {}  # key --> link
         if iterable is not None:
             self |= iterable
 
