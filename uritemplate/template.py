@@ -16,6 +16,7 @@ What do you do?
 """
 
 import re
+from uritemplate.orderedset import OrderedSet
 from uritemplate.variable import URIVariable
 
 template_re = re.compile('{([^}]+)}')
@@ -71,9 +72,10 @@ class URITemplate(object):
             URIVariable(m.groups()[0]) for m in template_re.finditer(self.uri)
         ]
         #: A set of variable names in the URI.
-        self.variable_names = set()
+        self.variable_names = OrderedSet()
         for variable in self.variables:
-            self.variable_names.update(variable.variable_names)
+            for name in variable.variable_names:
+                self.variable_names.add(name)
 
     def __repr__(self):
         return 'URITemplate("%s")' % self
