@@ -20,7 +20,7 @@ def load_examples(filename):
 def expected_set(expected):
     if isinstance(expected, list):
         return set(expected)
-    return set([expected])
+    return {expected}
 
 
 class FixtureMixin(object):
