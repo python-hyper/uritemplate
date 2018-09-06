@@ -544,24 +544,24 @@ class TestURIVariable(TestCase):
 
 class TestVariableModule(TestCase):
     def test_is_list_of_tuples(self):
-        l = [(1, 2), (3, 4)]
-        self.assertEqual(variable.is_list_of_tuples(l), (True, l))
+        a_list = [(1, 2), (3, 4)]
+        self.assertEqual(variable.is_list_of_tuples(a_list), (True, a_list))
 
-        l = [1, 2, 3, 4]
-        self.assertEqual(variable.is_list_of_tuples(l), (False, None))
+        a_list = [1, 2, 3, 4]
+        self.assertEqual(variable.is_list_of_tuples(a_list), (False, None))
 
     def test_list_test(self):
-        l = [1, 2, 3, 4]
-        self.assertEqual(variable.list_test(l), True)
+        a_list = [1, 2, 3, 4]
+        self.assertEqual(variable.list_test(a_list), True)
 
-        l = str([1, 2, 3, 4])
-        self.assertEqual(variable.list_test(l), False)
+        a_list = str([1, 2, 3, 4])
+        self.assertEqual(variable.list_test(a_list), False)
 
     def test_list_of_tuples_test(self):
-        l = [(1, 2), (3, 4)]
-        self.assertEqual(variable.dict_test(l), False)
+        a_list = [(1, 2), (3, 4)]
+        self.assertEqual(variable.dict_test(a_list), False)
 
-        d = dict(l)
+        d = dict(a_list)
         self.assertEqual(variable.dict_test(d), True)
 
 
