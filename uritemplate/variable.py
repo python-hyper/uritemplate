@@ -18,9 +18,9 @@ What do you do?
 import collections
 import sys
 
-if (2, 6) <= sys.version_info < (2, 8):
+if sys.version_info.major == 2:
     import urllib
-elif (3, 3) <= sys.version_info < (4, 0):
+elif sys.version_info.major == 3:
     import urllib.parse as urllib
 
 
