@@ -18,9 +18,9 @@ What do you do?
 import collections
 import sys
 
-if (2, 6) <= sys.version_info < (2, 8):
+if sys.version_info.major == 2:
     import urllib
-elif (3, 3) <= sys.version_info < (4, 0):
+elif sys.version_info.major == 3:
     import urllib.parse as urllib
 
 
@@ -149,11 +149,11 @@ class URIVariable(object):
                 return None
             if explode:
                 return self.join_str.join(
-                    '%s=%s' % (name, quote(v, safe)) for v in value
+                    '{}={}'.format(name, quote(v, safe)) for v in value
                 )
             else:
                 value = ','.join(quote(v, safe) for v in value)
-                return '%s=%s' % (name, value)
+                return '{}={}'.format(name, value)
 
         if dict_test(value) or tuples:
             if not value:
@@ -161,21 +161,21 @@ class URIVariable(object):
             items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
-                    '%s=%s' % (
+                    '{}={}'.format(
                         quote(k, safe), quote(v, safe)
                     ) for k, v in items
                 )
             else:
                 value = ','.join(
-                    '%s,%s' % (
+                    '{},{}'.format(
                         quote(k, safe), quote(v, safe)
                     ) for k, v in items
                 )
-                return '%s=%s' % (name, value)
+                return '{}={}'.format(name, value)
 
         if value:
             value = value[:prefix] if prefix else value
-            return '%s=%s' % (name, quote(value, safe))
+            return '{}={}'.format(name, quote(value, safe))
         return name + '='
 
     def _label_path_expansion(self, name, value, explode, prefix):
@@ -234,35 +234,35 @@ class URIVariable(object):
         if list_test(value) and not tuples:
             if explode:
                 expanded = join_str.join(
-                    '%s=%s' % (
+                    '{}={}'.format(
                         name, quote(v, safe)
                     ) for v in value if v is not None
                 )
                 return expanded if expanded else None
             else:
                 value = ','.join(quote(v, safe) for v in value)
-                return '%s=%s' % (name, value)
+                return '{}={}'.format(name, value)
 
         if dict_test(value) or tuples:
             items = items or sorted(value.items())
 
             if explode:
                 return join_str.join(
-                    '%s=%s' % (
+                    '{}={}'.format(
                         quote(k, safe), quote(v, safe)
                     ) for k, v in items if v is not None
                 )
             else:
                 expanded = ','.join(
-                    '%s,%s' % (
+                    '{},{}'.format(
                         quote(k, safe), quote(v, safe)
                     ) for k, v in items if v is not None
                 )
-                return '%s=%s' % (name, expanded)
+                return '{}={}'.format(name, expanded)
 
         value = value[:prefix] if prefix else value
         if value:
-            return '%s=%s' % (name, quote(value, safe))
+            return '{}={}'.format(name, quote(value, safe))
 
         return name
 
