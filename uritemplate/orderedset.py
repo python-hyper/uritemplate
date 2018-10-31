@@ -1,14 +1,18 @@
 # From: https://github.com/ActiveState/code/blob/master/recipes/Python/576696_OrderedSet_with_Weakrefs/  # noqa
 
-import collections
 from weakref import proxy
+
+try:
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc
 
 
 class Link(object):
     __slots__ = 'prev', 'next', 'key', '__weakref__'
 
 
-class OrderedSet(collections.MutableSet):
+class OrderedSet(collections_abc.MutableSet):
     'Set the remembers the order elements were added'
     # Big-O running times for all methods are the same as for regular sets.
     # The internal self.__map dictionary maps keys to links in a doubly linked

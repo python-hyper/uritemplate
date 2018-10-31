@@ -15,8 +15,12 @@ What do you do?
 
 """
 
-import collections
 import sys
+
+try:
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc
 
 if sys.version_info.major == 2:
     import urllib
@@ -360,7 +364,7 @@ def list_test(value):
 
 
 def dict_test(value):
-    return isinstance(value, (dict, collections.MutableMapping))
+    return isinstance(value, (dict, collections_abc.MutableMapping))
 
 
 try:
