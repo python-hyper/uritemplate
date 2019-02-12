@@ -19,6 +19,7 @@ matrix:
       env: TOXENV=py37dev
     - python: nightly
       dist: xenial
+      env: TOXENV=nightly
     - env: TOXENV=pep8
 
 install:
