@@ -11,6 +11,14 @@ matrix:
       env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
+    - python: 3.7
+      dist: xenial
+      env: TOXENV=py37
+    - python: 3.7-dev
+      dist: xenial
+      env: TOXENV=py37dev
+    - python: nightly
+      dist: xenial
     - env: TOXENV=pep8
 
 install:

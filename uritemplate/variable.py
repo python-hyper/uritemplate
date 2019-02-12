@@ -18,9 +18,9 @@ What do you do?
 import sys
 
 try:
-    import collections.abc as collections_abc
+    from collections.abc import MutableMapping
 except ImportError:
-    import collections as collections_abc
+    from collections import MutableMapping
 
 if sys.version_info.major == 2:
     import urllib
@@ -364,7 +364,7 @@ def list_test(value):
 
 
 def dict_test(value):
-    return isinstance(value, (dict, collections_abc.MutableMapping))
+    return isinstance(value, (dict, MutableMapping))
 
 
 try:
