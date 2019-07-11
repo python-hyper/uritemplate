@@ -200,10 +200,8 @@ class URIVariable(object):
             if not explode:
                 join_str = ','
 
-            expanded = join_str.join(
-                quote(v, safe) for v in value if value is not None
-            )
-            return expanded if expanded else None
+            fragments = [quote(v, safe) for v in value if v is not None]
+            return join_str.join(fragments) if fragments else None
 
         if dict_test(value) or tuples:
             items = items or sorted(value.items())
