@@ -464,6 +464,40 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
             None
         )
 
+    def test_label_path_expansion_explode_slash(self):
+        t = URITemplate('{/foo*}')
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', [], True, '/'), None
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', ['one'], True, '/'), 'one'
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', ['one', 'two'], True, '/'), 'one/two'
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', ['', ''], True, '/'), '/'
+        )
+
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {}, True, '/'), None
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {'one': ''}, True, '/'), 'one='
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {'one': '', 'two': ''}, True, '/'), 'one=/two='
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {'one': None}, True, '/'), None
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {'one': None, 'two': 'two'}, True, '/'), 'two=two'
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', {'one': None, 'two': None}, True, '/'), None
+        )
+
     def test_semi_path_expansion(self):
         t = URITemplate('{foo}')
         v = t.variables[0]
