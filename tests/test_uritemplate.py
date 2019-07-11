@@ -470,10 +470,22 @@ class TestURITemplate(RFCTemplateExamples('RFCMeta', (TestCase,), {})):
             'foo', [], True, '/'), None
         )
         self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', [None], True, '/'), None
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', [None, None], True, '/'), None
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
             'foo', ['one'], True, '/'), 'one'
         )
         self.assertEqual(t.variables[0]._label_path_expansion(
             'foo', ['one', 'two'], True, '/'), 'one/two'
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', ['one', None, 'two'], True, '/'), 'one/two'
+        )
+        self.assertEqual(t.variables[0]._label_path_expansion(
+            'foo', [''], True, '/'), ''
         )
         self.assertEqual(t.variables[0]._label_path_expansion(
             'foo', ['', ''], True, '/'), '/'
