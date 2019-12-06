@@ -1,3 +1,5 @@
+from io import open
+
 from setuptools import setup
 
 from uritemplate import __version__
