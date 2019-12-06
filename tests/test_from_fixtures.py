@@ -12,7 +12,7 @@ def fixture_file_path(filename):
 
 def load_examples(filename):
     path = fixture_file_path(filename)
-    with open(path, 'r') as examples_file:
+    with open(path, 'r', encoding="utf-8") as examples_file:
         examples = json.load(examples_file)
     return examples
 
