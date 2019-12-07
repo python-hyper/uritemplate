@@ -11,7 +11,7 @@
             "lang"         : "en",
             "geocode"      : ["37.76","-122.427"],
             "first_name"   : "John",
-            "last.name"    : "Doe", 
+            "last.name"    : "Doe",
             "Some%20Thing" : "foo",
             "number"       : 6,
             "long"         : 37.76,
@@ -28,7 +28,7 @@
         "testcases":[
 
             [ "{/id*}" , "/person" ],
-            [ "{/id*}{?fields,first_name,last.name,token}" , [ 
+            [ "{/id*}{?fields,first_name,last.name,token}" , [
             	"/person?fields=id,name,picture&first_name=John&last.name=Doe&token=12345",
             	"/person?fields=id,picture,name&first_name=John&last.name=Doe&token=12345",
             	"/person?fields=picture,name,id&first_name=John&last.name=Doe&token=12345",
@@ -68,7 +68,7 @@
         "testcases":[
 
             [ "{/id*}" , ["/person/albums","/albums/person"] ],
-            [ "{/id*}{?fields,token}" , [ 
+            [ "{/id*}{?fields,token}" , [
             	"/person/albums?fields=id,name,picture&token=12345",
             	"/person/albums?fields=id,picture,name&token=12345",
             	"/person/albums?fields=picture,name,id&token=12345",

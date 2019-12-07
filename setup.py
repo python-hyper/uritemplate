@@ -1,3 +1,5 @@
+from io import open
+
 from setuptools import setup
 
 from uritemplate import __version__
@@ -6,12 +8,17 @@ packages = [
     'uritemplate'
 ]
 
+with open("README.rst", encoding="utf-8") as file:
+    readme = file.read()
+
+with open("HISTORY.rst", encoding="utf-8") as file:
+    history = file.read()
+
 setup(
     name="uritemplate",
     version=__version__,
     description='URI templates',
-    long_description="\n\n".join([open("README.rst").read(),
-                                  open("HISTORY.rst").read()]),
+    long_description="\n\n".join([readme, history]),
     license="BSD 3-Clause License or Apache License, Version 2.0",
     author="Ian Stapleton Cordasco",
     author_email="graffatcolmingov@gmail.com",
@@ -34,6 +41,8 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
 )
