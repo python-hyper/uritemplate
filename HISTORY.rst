@@ -7,6 +7,7 @@ Changelog - uritemplate
 .. note:: This version is under active development
 
 - Update to Python 3.6, 3.7, and 3.8
+- Drop support for Python 2.6, 3.2, and 3.3
 - Ignore ``None`` in list argument expansion
 - Handle a list with an empty string appropriately
 
