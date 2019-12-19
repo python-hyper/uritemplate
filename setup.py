@@ -19,6 +19,7 @@ setup(
     version=__version__,
     description='URI templates',
     long_description="\n\n".join([readme, history]),
+    long_description_content_type="text/x-rst",
     license="BSD 3-Clause License or Apache License, Version 2.0",
     author="Ian Stapleton Cordasco",
     author_email="graffatcolmingov@gmail.com",

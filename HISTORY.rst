@@ -1,10 +1,8 @@
 Changelog - uritemplate
 =======================
 
-3.0.1 - 2019-12-DD
+3.0.1 - 2019-12-19
 ------------------
-
-.. note:: This version is under active development
 
 - Update to Python 3.6, 3.7, and 3.8
 - Drop support for Python 2.6, 3.2, and 3.3
@@ -57,7 +55,7 @@ Changelog - uritemplate.py
 0.3.0 - 2013-10-22
 ------------------
 
-- Add ``#partial`` to partially expand templates and return new instances of 
+- Add ``#partial`` to partially expand templates and return new instances of
   ``URITemplate``.
 
 0.2.0 - 2013-07-26
