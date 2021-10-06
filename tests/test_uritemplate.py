@@ -631,5 +631,29 @@ class TestAPI(TestCase):
                          URITemplate(self.uri).variable_names)
 
 
+class TestNativeTypeSupport(TestCase):
+    context = {
+        'zero': 0,
+        'one': 1,
+        'digits': list(range(10)),
+        'a_float': 3.1415,
+    }
+
+    def test_expand(self):
+        self.assertEqual(expand('{zero}', self.context), "0")
+        self.assertEqual(expand('{one}', self.context), "1")
+        self.assertEqual(expand('{digits}', self.context),
+                         "0,1,2,3,4,5,6,7,8,9")
+        self.assertEqual(expand('{?digits,one}', self.context),
+                         "?digits=0,1,2,3,4,5,6,7,8,9&one=1")
+        self.assertEqual(expand('{/digits}', self.context),
+                         "/0,1,2,3,4,5,6,7,8,9")
+        self.assertEqual(expand('{/digits*}', self.context),
+                         "/0/1/2/3/4/5/6/7/8/9")
+        # explicit testing for issue #53
+        self.assertEqual(expand('{/zero}', self.context), "/0")
+        self.assertEqual(expand('{/zero,a_float}', self.context), "/0/3.1415")
+
+
 if __name__ == '__main__':
     main()
