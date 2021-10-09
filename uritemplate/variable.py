@@ -191,7 +191,12 @@ class URIVariable(object):
         join_str = self.join_str
         safe = self.safe
 
-        if value is None or (len(value) == 0 and value != ''):
+        if (
+            value is None or (
+                not isinstance(value, (str, int, float, complex))
+                and len(value) == 0
+            )
+        ):
             return None
 
         tuples, items = is_list_of_tuples(value)
