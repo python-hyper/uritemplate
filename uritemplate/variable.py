@@ -15,7 +15,6 @@ What do you do?
 
 """
 import collections.abc
-import sys
 import urllib.parse
 
 
