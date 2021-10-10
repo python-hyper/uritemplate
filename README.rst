@@ -37,10 +37,10 @@ Where it might be useful to have a class
             if response.status_code == 200:
                 self.__dict__.update(response.json())
 
-When the module containing this class is loaded, ``GitHubUser.url`` is 
-evaluated and so the template is created once. It's often hard to notice in 
-Python, but object creation can consume a great deal of time and so can the 
-``re`` module which uritemplate relies on. Constructing the object once should 
+When the module containing this class is loaded, ``GitHubUser.url`` is
+evaluated and so the template is created once. It's often hard to notice in
+Python, but object creation can consume a great deal of time and so can the
+``re`` module which uritemplate relies on. Constructing the object once should
 reduce the amount of time your code takes to run.
 
 Installing

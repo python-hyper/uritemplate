@@ -6,7 +6,6 @@ uritemplate.api
 This module contains the very simple API provided by uritemplate.
 
 """
-
 from uritemplate.orderedset import OrderedSet
 from uritemplate.template import URITemplate
 

@@ -1,6 +1,12 @@
 Changelog - uritemplate
 =======================
 
+4.0.0 - 2021-10-xx
+------------------
+
+- Drop support for Python 2.7, 3.4, and 3.5
+- Better support number-like types as values for variables in a template
+
 3.0.1 - 2019-12-19
 ------------------
 

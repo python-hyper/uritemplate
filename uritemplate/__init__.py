@@ -12,15 +12,18 @@ See http://uritemplate.rtfd.org/ for documentation
 
 """
 
-__title__ = 'uritemplate'
-__author__ = 'Ian Cordasco'
-__license__ = 'Modified BSD or Apache License, Version 2.0'
-__copyright__ = 'Copyright 2013 Ian Cordasco'
-__version__ = '3.0.1'
-__version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
+__title__ = "uritemplate"
+__author__ = "Ian Cordasco"
+__license__ = "Modified BSD or Apache License, Version 2.0"
+__copyright__ = "Copyright 2013 Ian Cordasco"
+__version__ = "3.0.1"
+__version_info__ = tuple(int(i) for i in __version__.split(".") if i.isdigit())
 
 from uritemplate.api import (
-    URITemplate, expand, partial, variables  # noqa: E402
+    URITemplate,
+    expand,
+    partial,
+    variables,  # noqa: E402
 )
 
-__all__ = ('URITemplate', 'expand', 'partial', 'variables')
+__all__ = ("URITemplate", "expand", "partial", "variables")

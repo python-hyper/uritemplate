@@ -6,7 +6,7 @@ Release v\ |version|.
 Examples
 --------
 
-This first example shows how simple the API can be when using for a one-off 
+This first example shows how simple the API can be when using for a one-off
 item in a script or elsewhere.
 
 .. code-block:: python
@@ -18,12 +18,12 @@ item in a script or elsewhere.
 
     user = get(expand(uri, user='sigmavirus24')).json()
 
-This second example shows how using the class will save you time for template 
-parsing and object creation. Making the template once means the URI is parsed 
-once which decreases the number of :class:`URITemplate 
-<uritemplate.URITemplate>` objects created and usage of the ``re`` module.  
-This means that as soon as the file is parsed, the ``User.github_url`` and 
-``Repository.github_url`` variables are made once and only once. They're then 
+This second example shows how using the class will save you time for template
+parsing and object creation. Making the template once means the URI is parsed
+once which decreases the number of :class:`URITemplate
+<uritemplate.URITemplate>` objects created and usage of the ``re`` module.
+This means that as soon as the file is parsed, the ``User.github_url`` and
+``Repository.github_url`` variables are made once and only once. They're then
 usable in every instance of those classes.
 
 .. code-block:: python
@@ -61,9 +61,9 @@ API
 Implementation Details
 ----------------------
 
-Classes, their methods, and functions in this section are not part of the API 
-and as such are not meant to be used by users of ``uritemplate.py``. These are 
-documented here purely for reference as they are inadvertently exposed via the 
+Classes, their methods, and functions in this section are not part of the API
+and as such are not meant to be used by users of ``uritemplate.py``. These are
+documented here purely for reference as they are inadvertently exposed via the
 public API.
 
 For example::
@@ -72,9 +72,9 @@ For example::
     t.variables
     # => [URIVariable(/user)]
 
-Users can interact with :class:`URIVariable` objects as they see fit, but 
-their API may change and are not guaranteed to be consistent across versions.  
-Code relying on methods defined on :class:`URIVariable` and other classes, 
+Users can interact with :class:`URIVariable` objects as they see fit, but
+their API may change and are not guaranteed to be consistent across versions.
+Code relying on methods defined on :class:`URIVariable` and other classes,
 methods, and functions in this section may break in future releases.
 
 .. autoclass:: uritemplate.template.URIVariable

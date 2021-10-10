@@ -1,19 +1,14 @@
 # From: https://github.com/ActiveState/code/blob/master/recipes/Python/576696_OrderedSet_with_Weakrefs/  # noqa
-
+import collections.abc
 from weakref import proxy
 
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc
+
+class Link:
+    __slots__ = "prev", "next", "key", "__weakref__"
 
 
-class Link(object):
-    __slots__ = 'prev', 'next', 'key', '__weakref__'
-
-
-class OrderedSet(collections_abc.MutableSet):
-    'Set the remembers the order elements were added'
+class OrderedSet(collections.abc.MutableSet):
+    "Set the remembers the order elements were added"
     # Big-O running times for all methods are the same as for regular sets.
     # The internal self.__map dictionary maps keys to links in a doubly linked
     # list. The circular doubly linked list starts and ends with a sentinel
@@ -71,15 +66,15 @@ class OrderedSet(collections_abc.MutableSet):
 
     def pop(self, last=True):
         if not self:
-            raise KeyError('set is empty')
+            raise KeyError("set is empty")
         key = next(reversed(self)) if last else next(iter(self))
         self.discard(key)
         return key
 
     def __repr__(self):
         if not self:
-            return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, list(self))
+            return f"{self.__class__.__name__}()"
+        return f"{self.__class__.__name__}({list(self)!r})"
 
     def __str__(self):
         return self.__repr__()

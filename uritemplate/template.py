@@ -14,12 +14,12 @@ What do you do?
 >
 
 """
-
 import re
+
 from uritemplate.orderedset import OrderedSet
 from uritemplate.variable import URIVariable
 
-template_re = re.compile('{([^}]+)}')
+template_re = re.compile("{([^}]+)}")
 
 
 def _merge(var_dict, overrides):
@@ -30,7 +30,7 @@ def _merge(var_dict, overrides):
     return overrides
 
 
-class URITemplate(object):
+class URITemplate:
 
     """This parses the template and will be used to expand it.
 
@@ -99,11 +99,11 @@ class URITemplate(object):
             expanded.update(v.expand(expansion))
 
         def replace_all(match):
-            return expanded.get(match.groups()[0], '')
+            return expanded.get(match.groups()[0], "")
 
         def replace_partial(match):
             match = match.groups()[0]
-            var = '{%s}' % match
+            var = "{%s}" % match
             return expanded.get(match) or var
 
         replace = replace_partial if replace else replace_all

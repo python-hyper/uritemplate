@@ -14,21 +14,12 @@ What do you do?
 >
 
 """
-
+import collections.abc
 import sys
-
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc
-
-if sys.version_info.major == 2:
-    import urllib
-elif sys.version_info.major == 3:
-    import urllib.parse as urllib
+import urllib.parse
 
 
-class URIVariable(object):
+class URIVariable:
 
     """This object validates everything inside the URITemplate object.
 
@@ -48,16 +39,16 @@ class URIVariable(object):
 
     """
 
-    operators = ('+', '#', '.', '/', ';', '?', '&', '|', '!', '@')
+    operators = ("+", "#", ".", "/", ";", "?", "&", "|", "!", "@")
     reserved = ":/?#[]@!$&'()*+,;="
 
     def __init__(self, var):
         #: The original string that comes through with the variable
         self.original = var
         #: The operator for the variable
-        self.operator = ''
+        self.operator = ""
         #: List of safe characters when quoting the string
-        self.safe = ''
+        self.safe = ""
         #: List of variables in this variable
         self.variables = []
         #: List of variable names
@@ -69,7 +60,7 @@ class URIVariable(object):
         self.post_parse()
 
     def __repr__(self):
-        return 'URIVariable(%s)' % self
+        return "URIVariable(%s)" % self
 
     def __str__(self):
         return self.original
@@ -92,29 +83,29 @@ class URIVariable(object):
         if self.operator in URIVariable.operators[:2]:
             self.safe = URIVariable.reserved
 
-        var_list = var_list.split(',')
+        var_list = var_list.split(",")
 
         for var in var_list:
             default_val = None
             name = var
-            if '=' in var:
-                name, default_val = tuple(var.split('=', 1))
+            if "=" in var:
+                name, default_val = tuple(var.split("=", 1))
 
             explode = False
-            if name.endswith('*'):
+            if name.endswith("*"):
                 explode = True
                 name = name[:-1]
 
             prefix = None
-            if ':' in name:
-                name, prefix = tuple(name.split(':', 1))
+            if ":" in name:
+                name, prefix = tuple(name.split(":", 1))
                 prefix = int(prefix)
 
             if default_val:
                 self.defaults[name] = default_val
 
             self.variables.append(
-                (name, {'explode': explode, 'prefix': prefix})
+                (name, {"explode": explode, "prefix": prefix})
             )
 
         self.variable_names = [varname for (varname, _) in self.variables]
@@ -125,19 +116,19 @@ class URIVariable(object):
         After parsing the variable, we need to set up these attributes and it
         only makes sense to do it in a more easily testable way.
         """
-        self.safe = ''
+        self.safe = ""
         self.start = self.join_str = self.operator
-        if self.operator == '+':
-            self.start = ''
-        if self.operator in ('+', '#', ''):
-            self.join_str = ','
-        if self.operator == '#':
-            self.start = '#'
-        if self.operator == '?':
-            self.start = '?'
-            self.join_str = '&'
+        if self.operator == "+":
+            self.start = ""
+        if self.operator in ("+", "#", ""):
+            self.join_str = ","
+        if self.operator == "#":
+            self.start = "#"
+        if self.operator == "?":
+            self.start = "?"
+            self.join_str = "&"
 
-        if self.operator in ('+', '#'):
+        if self.operator in ("+", "#"):
             self.safe = URIVariable.reserved
 
     def _query_expansion(self, name, value, explode, prefix):
@@ -153,11 +144,11 @@ class URIVariable(object):
                 return None
             if explode:
                 return self.join_str.join(
-                    '{}={}'.format(name, quote(v, safe)) for v in value
+                    f"{name}={quote(v, safe)}" for v in value
                 )
             else:
-                value = ','.join(quote(v, safe) for v in value)
-                return '{}={}'.format(name, value)
+                value = ",".join(quote(v, safe) for v in value)
+                return f"{name}={value}"
 
         if dict_test(value) or tuples:
             if not value:
@@ -165,22 +156,18 @@ class URIVariable(object):
             items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
-                    '{}={}'.format(
-                        quote(k, safe), quote(v, safe)
-                    ) for k, v in items
+                    f"{quote(k, safe)}={quote(v, safe)}" for k, v in items
                 )
             else:
-                value = ','.join(
-                    '{},{}'.format(
-                        quote(k, safe), quote(v, safe)
-                    ) for k, v in items
+                value = ",".join(
+                    f"{quote(k, safe)},{quote(v, safe)}" for k, v in items
                 )
-                return '{}={}'.format(name, value)
+                return f"{name}={value}"
 
         if value:
             value = value[:prefix] if prefix else value
-            return '{}={}'.format(name, quote(value, safe))
-        return name + '='
+            return f"{name}={quote(value, safe)}"
+        return name + "="
 
     def _label_path_expansion(self, name, value, explode, prefix):
         """Label and path expansion method.
@@ -191,11 +178,9 @@ class URIVariable(object):
         join_str = self.join_str
         safe = self.safe
 
-        if (
-            value is None or (
-                not isinstance(value, (str, int, float, complex))
-                and len(value) == 0
-            )
+        if value is None or (
+            not isinstance(value, (str, int, float, complex))
+            and len(value) == 0
         ):
             return None
 
@@ -203,22 +188,22 @@ class URIVariable(object):
 
         if list_test(value) and not tuples:
             if not explode:
-                join_str = ','
+                join_str = ","
 
             fragments = [quote(v, safe) for v in value if v is not None]
             return join_str.join(fragments) if fragments else None
 
         if dict_test(value) or tuples:
             items = items or sorted(value.items())
-            format_str = '%s=%s'
+            format_str = "%s=%s"
             if not explode:
-                format_str = '%s,%s'
-                join_str = ','
+                format_str = "%s,%s"
+                join_str = ","
 
             expanded = join_str.join(
-                format_str % (
-                    quote(k, safe), quote(v, safe)
-                ) for k, v in items if v is not None
+                format_str % (quote(k, safe), quote(v, safe))
+                for k, v in items
+                if v is not None
             )
             return expanded if expanded else None
 
@@ -233,43 +218,41 @@ class URIVariable(object):
         if value is None:
             return None
 
-        if self.operator == '?':
-            join_str = '&'
+        if self.operator == "?":
+            join_str = "&"
 
         tuples, items = is_list_of_tuples(value)
 
         if list_test(value) and not tuples:
             if explode:
                 expanded = join_str.join(
-                    '{}={}'.format(
-                        name, quote(v, safe)
-                    ) for v in value if v is not None
+                    f"{name}={quote(v, safe)}" for v in value if v is not None
                 )
                 return expanded if expanded else None
             else:
-                value = ','.join(quote(v, safe) for v in value)
-                return '{}={}'.format(name, value)
+                value = ",".join(quote(v, safe) for v in value)
+                return f"{name}={value}"
 
         if dict_test(value) or tuples:
             items = items or sorted(value.items())
 
             if explode:
                 return join_str.join(
-                    '{}={}'.format(
-                        quote(k, safe), quote(v, safe)
-                    ) for k, v in items if v is not None
+                    f"{quote(k, safe)}={quote(v, safe)}"
+                    for k, v in items
+                    if v is not None
                 )
             else:
-                expanded = ','.join(
-                    '{},{}'.format(
-                        quote(k, safe), quote(v, safe)
-                    ) for k, v in items if v is not None
+                expanded = ",".join(
+                    f"{quote(k, safe)},{quote(v, safe)}"
+                    for k, v in items
+                    if v is not None
                 )
-                return '{}={}'.format(name, expanded)
+                return f"{name}={expanded}"
 
         value = value[:prefix] if prefix else value
         if value:
-            return '{}={}'.format(name, quote(value, safe))
+            return f"{name}={quote(value, safe)}"
 
         return name
 
@@ -280,16 +263,15 @@ class URIVariable(object):
         tuples, items = is_list_of_tuples(value)
 
         if list_test(value) and not tuples:
-            return ','.join(quote(v, self.safe) for v in value)
+            return ",".join(quote(v, self.safe) for v in value)
 
         if dict_test(value) or tuples:
             items = items or sorted(value.items())
-            format_str = '%s=%s' if explode else '%s,%s'
+            format_str = "%s=%s" if explode else "%s,%s"
 
-            return ','.join(
-                format_str % (
-                    quote(k, self.safe), quote(v, self.safe)
-                ) for k, v in items
+            return ",".join(
+                format_str % (quote(k, self.safe), quote(v, self.safe))
+                for k, v in items
             )
 
         value = value[:prefix] if prefix else value
@@ -326,37 +308,39 @@ class URIVariable(object):
 
         for name, opts in self.variables:
             value = var_dict.get(name, None)
-            if not value and value != '' and name in self.defaults:
+            if not value and value != "" and name in self.defaults:
                 value = self.defaults[name]
 
             if value is None:
                 continue
 
             expanded = None
-            if self.operator in ('/', '.'):
+            if self.operator in ("/", "."):
                 expansion = self._label_path_expansion
-            elif self.operator in ('?', '&'):
+            elif self.operator in ("?", "&"):
                 expansion = self._query_expansion
-            elif self.operator == ';':
+            elif self.operator == ";":
                 expansion = self._semi_path_expansion
             else:
                 expansion = self._string_expansion
 
-            expanded = expansion(name, value, opts['explode'], opts['prefix'])
+            expanded = expansion(name, value, opts["explode"], opts["prefix"])
 
             if expanded is not None:
                 return_values.append(expanded)
 
-        value = ''
+        value = ""
         if return_values:
             value = self.start + self.join_str.join(return_values)
         return {self.original: value}
 
 
 def is_list_of_tuples(value):
-    if (not value or
-            not isinstance(value, (list, tuple)) or
-            not all(isinstance(t, tuple) and len(t) == 2 for t in value)):
+    if (
+        not value
+        or not isinstance(value, (list, tuple))
+        or not all(isinstance(t, tuple) and len(t) == 2 for t in value)
+    ):
         return False, None
 
     return True, value
@@ -367,25 +351,16 @@ def list_test(value):
 
 
 def dict_test(value):
-    return isinstance(value, (dict, collections_abc.MutableMapping))
+    return isinstance(value, (dict, collections.abc.MutableMapping))
 
 
-try:
-    texttype = unicode
-except NameError:  # Python 3
-    texttype = str
-
-stringlikes = (texttype, bytes)
-
-
-def _encode(value, encoding='utf-8'):
-    if (isinstance(value, texttype) and
-            getattr(value, 'encode', None) is not None):
+def _encode(value, encoding="utf-8"):
+    if isinstance(value, str) and getattr(value, "encode", None) is not None:
         return value.encode(encoding)
     return value
 
 
 def quote(value, safe):
-    if not isinstance(value, stringlikes):
+    if not isinstance(value, (str, bytes)):
         value = str(value)
-    return urllib.quote(_encode(value), safe)
+    return urllib.parse.quote(_encode(value), safe)
