@@ -59,5 +59,5 @@ Modified BSD license_
 .. _Documentation: https://uritemplate.readthedocs.io/
 .. _GitHub: https://github.com/python-hyper/uritemplate
 .. _Travis-CI: https://travis-ci.org/python-hyper/uritemplate
-.. _URI Templates: http://tools.ietf.org/html/rfc6570
+.. _URI Templates: https://tools.ietf.org/html/rfc6570
 .. _license: https://github.com/python-hyper/uritemplate/blob/master/LICENSE
