@@ -6,11 +6,20 @@ uritemplate.api
 This module contains the very simple API provided by uritemplate.
 
 """
+import typing as t
+
+from uritemplate import variable
 from uritemplate.orderedset import OrderedSet
 from uritemplate.template import URITemplate
 
+__all__ = ("OrderedSet", "URITemplate", "expand", "partial", "variables")
 
-def expand(uri, var_dict=None, **kwargs):
+
+def expand(
+    uri: str,
+    var_dict: t.Optional[variable.VariableValueDict] = None,
+    **kwargs: variable.VariableValue,
+) -> str:
     """Expand the template with the given parameters.
 
     :param str uri: The templated URI to expand
@@ -34,7 +43,11 @@ def expand(uri, var_dict=None, **kwargs):
     return URITemplate(uri).expand(var_dict, **kwargs)
 
 
-def partial(uri, var_dict=None, **kwargs):
+def partial(
+    uri: str,
+    var_dict: t.Optional[variable.VariableValueDict] = None,
+    **kwargs: variable.VariableValue,
+) -> URITemplate:
     """Partially expand the template with the given parameters.
 
     If all of the parameters for the template are not given, return a
@@ -53,7 +66,7 @@ def partial(uri, var_dict=None, **kwargs):
     return URITemplate(uri).partial(var_dict, **kwargs)
 
 
-def variables(uri):
+def variables(uri: str) -> OrderedSet:
     """Parse the variables of the template.
 
     This returns all of the variable names in the URI Template.

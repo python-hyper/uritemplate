@@ -15,14 +15,18 @@ What do you do?
 
 """
 import re
+import typing as t
 
-from uritemplate.orderedset import OrderedSet
-from uritemplate.variable import URIVariable
+from uritemplate import orderedset
+from uritemplate import variable
 
 template_re = re.compile("{([^}]+)}")
 
 
-def _merge(var_dict, overrides):
+def _merge(
+    var_dict: t.Optional[variable.VariableValueDict],
+    overrides: variable.VariableValueDict,
+) -> variable.VariableValueDict:
     if var_dict:
         opts = var_dict.copy()
         opts.update(overrides)
@@ -63,54 +67,63 @@ class URITemplate:
 
     """
 
-    def __init__(self, uri):
+    def __init__(self, uri: str):
         #: The original URI to be parsed.
-        self.uri = uri
+        self.uri: str = uri
         #: A list of the variables in the URI. They are stored as
-        #: :class:`URIVariable`\ s
-        self.variables = [
-            URIVariable(m.groups()[0]) for m in template_re.finditer(self.uri)
+        #: :class:`~uritemplate.variable.URIVariable`\ s
+        self.variables: t.List[variable.URIVariable] = [
+            variable.URIVariable(m.groups()[0])
+            for m in template_re.finditer(self.uri)
         ]
         #: A set of variable names in the URI.
-        self.variable_names = OrderedSet()
-        for variable in self.variables:
-            for name in variable.variable_names:
+        self.variable_names = orderedset.OrderedSet()
+        for var in self.variables:
+            for name in var.variable_names:
                 self.variable_names.add(name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'URITemplate("%s")' % self
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.uri
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, URITemplate):
+            return NotImplemented
         return self.uri == other.uri
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.uri)
 
-    def _expand(self, var_dict, replace):
+    def _expand(
+        self, var_dict: variable.VariableValueDict, replace: bool
+    ) -> str:
         if not self.variables:
             return self.uri
 
         expansion = var_dict
-        expanded = {}
+        expanded: t.Dict[str, str] = {}
         for v in self.variables:
             expanded.update(v.expand(expansion))
 
-        def replace_all(match):
+        def replace_all(match: "re.Match[str]") -> str:
             return expanded.get(match.groups()[0], "")
 
-        def replace_partial(match):
-            match = match.groups()[0]
-            var = "{%s}" % match
-            return expanded.get(match) or var
+        def replace_partial(match: "re.Match[str]") -> str:
+            match_group = match.groups()[0]
+            var = "{%s}" % match_group
+            return expanded.get(match_group) or var
 
-        replace = replace_partial if replace else replace_all
+        replace_func = replace_partial if replace else replace_all
 
-        return template_re.sub(replace, self.uri)
+        return template_re.sub(replace_func, self.uri)
 
-    def expand(self, var_dict=None, **kwargs):
+    def expand(
+        self,
+        var_dict: t.Optional[variable.VariableValueDict] = None,
+        **kwargs: variable.VariableValue,
+    ) -> str:
         """Expand the template with the given parameters.
 
         :param dict var_dict: Optional dictionary with variables and values
@@ -133,7 +146,11 @@ class URITemplate:
         """
         return self._expand(_merge(var_dict, kwargs), False)
 
-    def partial(self, var_dict=None, **kwargs):
+    def partial(
+        self,
+        var_dict: t.Optional[variable.VariableValueDict] = None,
+        **kwargs: variable.VariableValue,
+    ) -> "URITemplate":
         """Partially expand the template with the given parameters.
 
         If all of the parameters for the template are not given, return a

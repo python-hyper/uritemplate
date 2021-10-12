@@ -15,7 +15,17 @@ What do you do?
 
 """
 import collections.abc
+import typing as t
 import urllib.parse
+
+ScalarVariableValue = t.Union[int, float, complex, str]
+VariableValue = t.Union[
+    t.Sequence[ScalarVariableValue],
+    t.Mapping[str, ScalarVariableValue],
+    t.Tuple[str, ScalarVariableValue],
+    ScalarVariableValue,
+]
+VariableValueDict = t.Dict[str, VariableValue]
 
 
 class URIVariable:
@@ -41,30 +51,32 @@ class URIVariable:
     operators = ("+", "#", ".", "/", ";", "?", "&", "|", "!", "@")
     reserved = ":/?#[]@!$&'()*+,;="
 
-    def __init__(self, var):
+    def __init__(self, var: str):
         #: The original string that comes through with the variable
-        self.original = var
+        self.original: str = var
         #: The operator for the variable
-        self.operator = ""
+        self.operator: str = ""
         #: List of safe characters when quoting the string
-        self.safe = ""
+        self.safe: str = ""
         #: List of variables in this variable
-        self.variables = []
+        self.variables: t.List[
+            t.Tuple[str, t.MutableMapping[str, t.Any]]
+        ] = []
         #: List of variable names
-        self.variable_names = []
+        self.variable_names: t.List[str] = []
         #: List of defaults passed in
-        self.defaults = {}
+        self.defaults: t.MutableMapping[str, ScalarVariableValue] = {}
         # Parse the variable itself.
         self.parse()
         self.post_parse()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "URIVariable(%s)" % self
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.original
 
-    def parse(self):
+    def parse(self) -> None:
         """Parse the variable.
 
         This finds the:
@@ -74,15 +86,15 @@ class URIVariable:
             - defaults.
 
         """
-        var_list = self.original
+        var_list_str = self.original
         if self.original[0] in URIVariable.operators:
             self.operator = self.original[0]
-            var_list = self.original[1:]
+            var_list_str = self.original[1:]
 
         if self.operator in URIVariable.operators[:2]:
             self.safe = URIVariable.reserved
 
-        var_list = var_list.split(",")
+        var_list = var_list_str.split(",")
 
         for var in var_list:
             default_val = None
@@ -95,10 +107,10 @@ class URIVariable:
                 explode = True
                 name = name[:-1]
 
-            prefix = None
+            prefix: t.Optional[int] = None
             if ":" in name:
-                name, prefix = tuple(name.split(":", 1))
-                prefix = int(prefix)
+                name, prefix_str = tuple(name.split(":", 1))
+                prefix = int(prefix_str)
 
             if default_val:
                 self.defaults[name] = default_val
@@ -109,7 +121,7 @@ class URIVariable:
 
         self.variable_names = [varname for (varname, _) in self.variables]
 
-    def post_parse(self):
+    def post_parse(self) -> None:
         """Set ``start``, ``join_str`` and ``safe`` attributes.
 
         After parsing the variable, we need to set up these attributes and it
@@ -130,7 +142,13 @@ class URIVariable:
         if self.operator in ("+", "#"):
             self.safe = URIVariable.reserved
 
-    def _query_expansion(self, name, value, explode, prefix):
+    def _query_expansion(
+        self,
+        name: str,
+        value: VariableValue,
+        explode: bool,
+        prefix: t.Optional[int],
+    ) -> t.Optional[str]:
         """Expansion method for the '?' and '&' operators."""
         if value is None:
             return None
@@ -141,6 +159,7 @@ class URIVariable:
         if list_test(value) and not tuples:
             if not value:
                 return None
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
             if explode:
                 return self.join_str.join(
                     f"{name}={quote(v, safe)}" for v in value
@@ -152,6 +171,7 @@ class URIVariable:
         if dict_test(value) or tuples:
             if not value:
                 return None
+            value = t.cast(t.Mapping[str, ScalarVariableValue], value)
             items = items or sorted(value.items())
             if explode:
                 return self.join_str.join(
@@ -164,11 +184,18 @@ class URIVariable:
                 return f"{name}={value}"
 
         if value:
+            value = t.cast(t.Text, value)
             value = value[:prefix] if prefix else value
             return f"{name}={quote(value, safe)}"
         return name + "="
 
-    def _label_path_expansion(self, name, value, explode, prefix):
+    def _label_path_expansion(
+        self,
+        name: str,
+        value: VariableValue,
+        explode: bool,
+        prefix: t.Optional[int],
+    ) -> t.Optional[str]:
         """Label and path expansion method.
 
         Expands for operators: '/', '.'
@@ -189,10 +216,12 @@ class URIVariable:
             if not explode:
                 join_str = ","
 
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
             fragments = [quote(v, safe) for v in value if v is not None]
             return join_str.join(fragments) if fragments else None
 
         if dict_test(value) or tuples:
+            value = t.cast(t.Mapping[str, ScalarVariableValue], value)
             items = items or sorted(value.items())
             format_str = "%s=%s"
             if not explode:
@@ -206,10 +235,17 @@ class URIVariable:
             )
             return expanded if expanded else None
 
+        value = t.cast(t.Text, value)
         value = value[:prefix] if prefix else value
         return quote(value, safe)
 
-    def _semi_path_expansion(self, name, value, explode, prefix):
+    def _semi_path_expansion(
+        self,
+        name: str,
+        value: VariableValue,
+        explode: bool,
+        prefix: t.Optional[int],
+    ) -> t.Optional[str]:
         """Expansion method for ';' operator."""
         join_str = self.join_str
         safe = self.safe
@@ -223,6 +259,7 @@ class URIVariable:
         tuples, items = is_list_of_tuples(value)
 
         if list_test(value) and not tuples:
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
             if explode:
                 expanded = join_str.join(
                     f"{name}={quote(v, safe)}" for v in value if v is not None
@@ -233,6 +270,7 @@ class URIVariable:
                 return f"{name}={value}"
 
         if dict_test(value) or tuples:
+            value = t.cast(t.Mapping[str, ScalarVariableValue], value)
             items = items or sorted(value.items())
 
             if explode:
@@ -249,22 +287,31 @@ class URIVariable:
                 )
                 return f"{name}={expanded}"
 
+        value = t.cast(t.Text, value)
         value = value[:prefix] if prefix else value
         if value:
             return f"{name}={quote(value, safe)}"
 
         return name
 
-    def _string_expansion(self, name, value, explode, prefix):
+    def _string_expansion(
+        self,
+        name: str,
+        value: VariableValue,
+        explode: bool,
+        prefix: t.Optional[int],
+    ) -> t.Optional[str]:
         if value is None:
             return None
 
         tuples, items = is_list_of_tuples(value)
 
         if list_test(value) and not tuples:
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
             return ",".join(quote(v, self.safe) for v in value)
 
         if dict_test(value) or tuples:
+            value = t.cast(t.Mapping[str, ScalarVariableValue], value)
             items = items or sorted(value.items())
             format_str = "%s=%s" if explode else "%s,%s"
 
@@ -273,10 +320,13 @@ class URIVariable:
                 for k, v in items
             )
 
+        value = t.cast(t.Text, value)
         value = value[:prefix] if prefix else value
         return quote(value, self.safe)
 
-    def expand(self, var_dict=None):
+    def expand(
+        self, var_dict: t.Optional[VariableValueDict] = None
+    ) -> t.Mapping[str, str]:
         """Expand the variable in question.
 
         Using ``var_dict`` and the previously parsed defaults, expand this
@@ -304,6 +354,8 @@ class URIVariable:
 
         """
         return_values = []
+        if var_dict is None:
+            return {self.original: self.original}
 
         for name, opts in self.variables:
             value = var_dict.get(name, None)
@@ -334,7 +386,9 @@ class URIVariable:
         return {self.original: value}
 
 
-def is_list_of_tuples(value):
+def is_list_of_tuples(
+    value: t.Any,
+) -> t.Tuple[bool, t.Optional[t.Sequence[t.Tuple[str, ScalarVariableValue]]]]:
     if (
         not value
         or not isinstance(value, (list, tuple))
@@ -345,21 +399,21 @@ def is_list_of_tuples(value):
     return True, value
 
 
-def list_test(value):
+def list_test(value: t.Any) -> bool:
     return isinstance(value, (list, tuple))
 
 
-def dict_test(value):
+def dict_test(value: t.Any) -> bool:
     return isinstance(value, (dict, collections.abc.MutableMapping))
 
 
-def _encode(value, encoding="utf-8"):
-    if isinstance(value, str) and getattr(value, "encode", None) is not None:
+def _encode(value: t.AnyStr, encoding: str = "utf-8") -> bytes:
+    if isinstance(value, str):
         return value.encode(encoding)
     return value
 
 
-def quote(value, safe):
+def quote(value: t.Any, safe: str) -> str:
     if not isinstance(value, (str, bytes)):
         value = str(value)
     return urllib.parse.quote(_encode(value), safe)

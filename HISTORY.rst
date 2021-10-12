@@ -1,6 +1,12 @@
 Changelog - uritemplate
 =======================
 
+4.1.0 - 2021-10-12
+------------------
+
+- Add type annotations to uritemplate and distribute them for others to use
+- Update to a modern documentation theme as well
+
 4.0.0 - 2021-10-10
 ------------------
 
