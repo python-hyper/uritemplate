@@ -1,6 +1,12 @@
 Changelog - uritemplate
 =======================
 
+4.1.1 - 2021-10-13
+------------------
+
+- Fix setup.cfg metadata to reflect lack of support for Python 2 as desired in
+  4.0
+
 4.1.0 - 2021-10-12
 ------------------
 
