@@ -12,10 +12,6 @@
 import os
 import sys
 
-# This environment variable makes decorators not decorate functions, so their
-# signatures in the generated documentation are still correct
-os.environ["GENERATING_DOCUMENTATION"] = "uritemplate"
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -29,7 +25,11 @@ import uritemplate
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -45,7 +45,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "uritemplate"
-copyright = "2013 - Ian Cordasco"
+copyright = "2013 - Ian Stapleton Cordasco"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -95,7 +95,7 @@ exclude_patterns = ["_build"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "nature"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -188,7 +188,7 @@ latex_documents = [
         "index",
         "uritemplate.tex",
         "uritemplate Documentation",
-        "Ian Cordasco",
+        "Ian Stapleton Cordasco",
         "manual",
     ),
 ]
@@ -226,7 +226,7 @@ man_pages = [
         "index",
         "uritemplate",
         "uritemplate Documentation",
-        ["Ian Cordasco"],
+        ["Ian Stapleton Cordasco"],
         1,
     )
 ]
@@ -244,7 +244,7 @@ texinfo_documents = [
         "index",
         "uritemplate",
         "uritemplate Documentation",
-        "Ian Cordasco",
+        "Ian Stapleton Cordasco",
         "uritemplate",
         "Library to expand RFC6570 templated URIs",
         "Miscellaneous",

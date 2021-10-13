@@ -49,13 +49,13 @@ API
 
 .. module:: uritemplate
 
-.. autofunction:: uritemplate.expand
+.. autofunction:: uritemplate.api.expand
 
-.. autofunction:: uritemplate.partial
+.. autofunction:: uritemplate.api.partial
 
-.. autofunction:: uritemplate.variables
+.. autofunction:: uritemplate.api.variables
 
-.. autoclass:: uritemplate.URITemplate
+.. autoclass:: uritemplate.template.URITemplate
     :members:
 
 Implementation Details
@@ -72,10 +72,11 @@ For example::
     t.variables
     # => [URIVariable(/user)]
 
-Users can interact with :class:`URIVariable` objects as they see fit, but
-their API may change and are not guaranteed to be consistent across versions.
-Code relying on methods defined on :class:`URIVariable` and other classes,
-methods, and functions in this section may break in future releases.
+Users can interact with :class:`~uritemplate.variable.URIVariable` objects as
+they see fit, but their API may change and are not guaranteed to be consistent
+across versions. Code relying on methods defined on
+:class:`~uritemplate.variable.URIVariable` and other classes, methods, and
+functions in this section may break in future releases.
 
-.. autoclass:: uritemplate.template.URIVariable
+.. autoclass:: uritemplate.variable.URIVariable
     :members: expand
