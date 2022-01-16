@@ -1,4 +1,4 @@
-Theses test are borrowed from https://github.com/uri-templates/uritemplate-test
+These test are borrowed from https://github.com/uri-templates/uritemplate-test
 at commit: fdd5d611a849b922c2ff40fc3997fd265dd14c02
 URI Template Tests
 ==================
