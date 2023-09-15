@@ -17,7 +17,7 @@ jobs:
           - { VERSION: "3.10", TOXENV: "py310",ALLOW_FAILURE: false }
           - { VERSION: "3.11", TOXENV: "py311,pep8,pre-commit", ALLOW_FAILURE: false }
           - { VERSION: "3.12", TOXENV: "py312",ALLOW_FAILURE: false }
-          - { VERSION: "pypy3", TOXENV: "pypy", ALLOW_FAILURE: false }
+          - { VERSION: "pypy3.10", TOXENV: "pypy", ALLOW_FAILURE: false }
 
     steps:
       - name: Check out the repository
