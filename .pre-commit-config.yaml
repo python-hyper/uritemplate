@@ -8,21 +8,21 @@ repos:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.10.0
+    rev: v3.11.0
     hooks:
     -   id: reorder-python-imports
-        args: [--application-directories, '.:src', --py36-plus]
+        args: [--application-directories, '.:src', --py38-plus]
 -   repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.9.1
     hooks:
     -   id: black
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.11.0
     hooks:
     -   id: pyupgrade
-        args: [--py36-plus]
+        args: [--py38-plus]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.0
+    rev: v1.5.1
     hooks:
     -   id: mypy
         exclude: ^(docs/|tests/)
@@ -34,4 +34,4 @@ repos:
     rev: v2.4.0
     hooks:
     -   id: setup-cfg-fmt
-        args: [--min-py3-version, '3.6']
+        args: [--min-py3-version, '3.8']
