@@ -6,6 +6,7 @@ uritemplate.api
 This module contains the very simple API provided by uritemplate.
 
 """
+
 import typing as t
 
 from uritemplate import variable
