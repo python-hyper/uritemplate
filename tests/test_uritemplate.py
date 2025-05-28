@@ -1,9 +1,9 @@
-from unittest import main
 from unittest import TestCase
+from unittest import main
 
+from uritemplate import URITemplate
 from uritemplate import expand
 from uritemplate import partial
-from uritemplate import URITemplate
 from uritemplate import variable
 from uritemplate import variables
 

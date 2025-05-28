@@ -14,6 +14,7 @@ What do you do?
 >
 
 """
+
 import collections.abc
 import typing as t
 import urllib.parse
@@ -29,7 +30,6 @@ VariableValueDict = t.Dict[str, VariableValue]
 
 
 class URIVariable:
-
     """This object validates everything inside the URITemplate object.
 
     It validates template expansions and will truncate length as decided by
@@ -59,9 +59,9 @@ class URIVariable:
         #: List of safe characters when quoting the string
         self.safe: str = ""
         #: List of variables in this variable
-        self.variables: t.List[
-            t.Tuple[str, t.MutableMapping[str, t.Any]]
-        ] = []
+        self.variables: t.List[t.Tuple[str, t.MutableMapping[str, t.Any]]] = (
+            []
+        )
         #: List of variable names
         self.variable_names: t.List[str] = []
         #: List of defaults passed in

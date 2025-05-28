@@ -14,6 +14,7 @@ What do you do?
 >
 
 """
+
 import re
 import typing as t
 
@@ -35,7 +36,6 @@ def _merge(
 
 
 class URITemplate:
-
     """This parses the template and will be used to expand it.
 
     This is the most important object as the center of the API.
