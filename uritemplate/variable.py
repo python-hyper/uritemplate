@@ -19,9 +19,10 @@ import collections.abc
 import typing as t
 import urllib.parse
 
-ScalarVariableValue = t.Union[int, float, complex, str]
+ScalarVariableValue = t.Union[int, float, complex, str, None]
 VariableValue = t.Union[
     t.Sequence[ScalarVariableValue],
+    t.List[ScalarVariableValue],
     t.Mapping[str, ScalarVariableValue],
     t.Tuple[str, ScalarVariableValue],
     ScalarVariableValue,
@@ -110,7 +111,7 @@ class URIVariable:
             prefix: t.Optional[int] = None
             if ":" in name:
                 name, prefix_str = tuple(name.split(":", 1))
-                prefix = int(prefix_str)
+                prefix = int(prefix_str, 10)
 
             if default_val:
                 self.defaults[name] = default_val

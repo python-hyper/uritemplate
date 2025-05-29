@@ -25,11 +25,9 @@ __version_info__ = tuple(
     int(i) for i in __version__.split(".") if i.isdigit()
 )
 
-from uritemplate.api import (
-    URITemplate,
-    expand,
-    partial,
-    variables,
-)
+from uritemplate.api import URITemplate
+from uritemplate.api import expand
+from uritemplate.api import partial
+from uritemplate.api import variables
 
 __all__ = ("URITemplate", "expand", "partial", "variables")

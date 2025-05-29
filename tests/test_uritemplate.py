@@ -1,18 +1,32 @@
-from unittest import main
-from unittest import TestCase
+import collections.abc
+import typing as t
+import unittest
 
+from uritemplate import URITemplate
 from uritemplate import expand
 from uritemplate import partial
-from uritemplate import URITemplate
 from uritemplate import variable
 from uritemplate import variables
 
 
-def merge_dicts(*args):
-    d = {}
+def merge_dicts(
+    *args: t.Union[
+        variable.VariableValueDict, t.Dict[str, str], t.Dict[str, t.List[str]]
+    ]
+) -> variable.VariableValueDict:
+    d: t.Dict[str, variable.VariableValue] = {}
     for arg in args:
         d.update(arg)
     return d
+
+
+ExampleVariables = variable.VariableValueDict
+ExampleTemplatesAndResults = t.List[t.Tuple[str, t.Union[str, t.List[str]]]]
+
+
+class ExampleWithVariables(t.TypedDict):
+    expansion: ExampleVariables
+    expected: str
 
 
 class RFCTemplateExamples(type):
@@ -361,12 +375,19 @@ class RFCTemplateExamples(type):
         },
     }
 
-    def __new__(cls, name, bases, attrs):
-        def make_test(d):
-            def _test_(self):
+    def __new__(
+        cls, name: str, bases: t.Sequence[t.Any], attrs: t.Dict[str, t.Any]
+    ) -> t.Any:
+        def make_test(
+            d: t.Dict[str, ExampleWithVariables],
+        ) -> collections.abc.Callable[["unittest.TestCase"], None]:
+            def _test_(self: "unittest.TestCase") -> None:
                 for k, v in d.items():
-                    t = URITemplate(k)
-                    self.assertEqual(t.expand(v["expansion"]), v["expected"])
+                    with self.subTest(template=k, **v):
+                        t = URITemplate(k)
+                        self.assertEqual(
+                            t.expand(v["expansion"]), v["expected"]
+                        )
 
             return _test_
 
@@ -380,11 +401,11 @@ class RFCTemplateExamples(type):
             testname = "test_%s" % name
             attrs[testname] = make_test(value)
 
-        return type.__new__(cls, name, bases, attrs)
+        return type.__new__(cls, name, bases, attrs)  # type: ignore
 
 
-class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
-    def test_no_variables_in_uri(self):
+class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
+    def test_no_variables_in_uri(self) -> None:
         """
         This test ensures that if there are no variables present, the
         template evaluates to itself.
@@ -394,7 +415,7 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
         self.assertEqual(t.expand(), uri)
         self.assertEqual(t.expand(users="foo"), uri)
 
-    def test_all_variables_parsed(self):
+    def test_all_variables_parsed(self) -> None:
         """
         This test ensures that all variables are parsed.
         """
@@ -409,7 +430,7 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
             t = URITemplate(uri)
             self.assertEqual(len(t.variables), i)
 
-    def test_expand(self):
+    def test_expand(self) -> None:
         """
         This test ensures that expansion works as expected.
         """
@@ -427,7 +448,7 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
             t.expand({"repo": "github3.py"}, user="sigmavirus24"), expanded
         )
 
-    def test_str_repr(self):
+    def test_str_repr(self) -> None:
         uri = "https://api.github.com{/endpoint}"
         t = URITemplate(uri)
         self.assertEqual(str(t), uri)
@@ -435,11 +456,11 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
         self.assertEqual(repr(t), 'URITemplate("%s")' % uri)
         self.assertEqual(repr(t.variables[0]), "URIVariable(/endpoint)")
 
-    def test_hash(self):
+    def test_hash(self) -> None:
         uri = "https://api.github.com{/endpoint}"
         self.assertEqual(hash(URITemplate(uri)), hash(uri))
 
-    def test_default_value(self):
+    def test_default_value(self) -> None:
         uri = "https://api.github.com/user{/user=sigmavirus24}"
         t = URITemplate(uri)
         self.assertEqual(
@@ -449,93 +470,93 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
             t.expand(user="lukasa"), "https://api.github.com/user/lukasa"
         )
 
-    def test_query_expansion(self):
+    def test_query_expansion(self) -> None:
         t = URITemplate("{foo}")
         self.assertEqual(
-            t.variables[0]._query_expansion("foo", None, False, False), None
+            t.variables[0]._query_expansion("foo", None, False, None), None
         )
 
-    def test_label_path_expansion(self):
+    def test_label_path_expansion(self) -> None:
         t = URITemplate("{foo}")
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", None, False, False),
+            t.variables[0]._label_path_expansion("foo", None, False, None),
             None,
         )
 
-    def test_label_path_expansion_explode_slash(self):
+    def test_label_path_expansion_explode_slash(self) -> None:
         t = URITemplate("{/foo*}")
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", [], True, "/"), None
+            t.variables[0]._label_path_expansion("foo", [], True, None), None
         )
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", [None], True, "/"),
+            t.variables[0]._label_path_expansion("foo", [None], True, None),
             None,
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", [None, None], True, "/"
+                "foo", [None, None], True, None
             ),
             None,
         )
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", ["one"], True, "/"),
+            t.variables[0]._label_path_expansion("foo", ["one"], True, None),
             "one",
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", ["one", "two"], True, "/"
+                "foo", ["one", "two"], True, None
             ),
             "one/two",
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", ["one", None, "two"], True, "/"
+                "foo", ["one", None, "two"], True, None
             ),
             "one/two",
         )
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", [""], True, "/"), ""
+            t.variables[0]._label_path_expansion("foo", [""], True, None), ""
         )
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", ["", ""], True, "/"),
+            t.variables[0]._label_path_expansion("foo", ["", ""], True, None),
             "/",
         )
 
         self.assertEqual(
-            t.variables[0]._label_path_expansion("foo", {}, True, "/"), None
+            t.variables[0]._label_path_expansion("foo", {}, True, None), None
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", {"one": ""}, True, "/"
+                "foo", {"one": ""}, True, None
             ),
             "one=",
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", {"one": "", "two": ""}, True, "/"
+                "foo", {"one": "", "two": ""}, True, None
             ),
             "one=/two=",
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", {"one": None}, True, "/"
+                "foo", {"one": None}, True, None
             ),
             None,
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", {"one": None, "two": "two"}, True, "/"
+                "foo", {"one": None, "two": "two"}, True, None
             ),
             "two=two",
         )
         self.assertEqual(
             t.variables[0]._label_path_expansion(
-                "foo", {"one": None, "two": None}, True, "/"
+                "foo", {"one": None, "two": None}, True, None
             ),
             None,
         )
 
-    def test_semi_path_expansion(self):
+    def test_semi_path_expansion(self) -> None:
         t = URITemplate("{foo}")
         v = t.variables[0]
         self.assertEqual(
@@ -547,38 +568,38 @@ class TestURITemplate(TestCase, metaclass=RFCTemplateExamples):
             "foo=bar&foo=bogus",
         )
 
-    def test_string_expansion(self):
+    def test_string_expansion(self) -> None:
         t = URITemplate("{foo}")
         self.assertEqual(
             t.variables[0]._string_expansion("foo", None, False, False), None
         )
 
-    def test_hashability(self):
+    def test_hashability(self) -> None:
         t = URITemplate("{foo}")
         u = URITemplate("{foo}")
         d = {t: 1}
         d[u] += 1
         self.assertEqual(d, {t: 2})
 
-    def test_no_mutate(self):
-        args = {}
+    def test_no_mutate(self) -> None:
+        args: variable.VariableValueDict = {}
         t = URITemplate("")
         t.expand(args, key=1)
         self.assertEqual(args, {})
 
 
-class TestURIVariable(TestCase):
-    def setUp(self):
+class TestURIVariable(unittest.TestCase):
+    def setUp(self) -> None:
         self.v = variable.URIVariable("{foo}")
 
-    def test_post_parse(self):
+    def test_post_parse(self) -> None:
         v = self.v
         self.assertEqual(v.join_str, ",")
         self.assertEqual(v.operator, "")
         self.assertEqual(v.safe, "")
         self.assertEqual(v.start, "")
 
-    def test_post_parse_plus(self):
+    def test_post_parse_plus(self) -> None:
         v = self.v
         v.operator = "+"
         v.post_parse()
@@ -586,7 +607,7 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.safe, variable.URIVariable.reserved)
         self.assertEqual(v.start, "")
 
-    def test_post_parse_octothorpe(self):
+    def test_post_parse_octothorpe(self) -> None:
         v = self.v
         v.operator = "#"
         v.post_parse()
@@ -594,7 +615,7 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.safe, variable.URIVariable.reserved)
         self.assertEqual(v.start, "#")
 
-    def test_post_parse_question(self):
+    def test_post_parse_question(self) -> None:
         v = self.v
         v.operator = "?"
         v.post_parse()
@@ -602,7 +623,7 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.safe, "")
         self.assertEqual(v.start, "?")
 
-    def test_post_parse_ampersand(self):
+    def test_post_parse_ampersand(self) -> None:
         v = self.v
         v.operator = "&"
         v.post_parse()
@@ -611,22 +632,22 @@ class TestURIVariable(TestCase):
         self.assertEqual(v.start, "&")
 
 
-class TestVariableModule(TestCase):
-    def test_is_list_of_tuples(self):
+class TestVariableModule(unittest.TestCase):
+    def test_is_list_of_tuples(self) -> None:
         a_list = [(1, 2), (3, 4)]
         self.assertEqual(variable.is_list_of_tuples(a_list), (True, a_list))
 
-        a_list = [1, 2, 3, 4]
-        self.assertEqual(variable.is_list_of_tuples(a_list), (False, None))
+        b_list = [1, 2, 3, 4]
+        self.assertEqual(variable.is_list_of_tuples(b_list), (False, None))
 
-    def test_list_test(self):
+    def test_list_test(self) -> None:
         a_list = [1, 2, 3, 4]
         self.assertEqual(variable.list_test(a_list), True)
 
-        a_list = str([1, 2, 3, 4])
-        self.assertEqual(variable.list_test(a_list), False)
+        b_list = str([1, 2, 3, 4])
+        self.assertEqual(variable.list_test(b_list), False)
 
-    def test_list_of_tuples_test(self):
+    def test_list_of_tuples_test(self) -> None:
         a_list = [(1, 2), (3, 4)]
         self.assertEqual(variable.dict_test(a_list), False)
 
@@ -634,16 +655,16 @@ class TestVariableModule(TestCase):
         self.assertEqual(variable.dict_test(d), True)
 
 
-class TestAPI(TestCase):
+class TestAPI(unittest.TestCase):
     uri = "https://api.github.com{/endpoint}"
 
-    def test_expand(self):
+    def test_expand(self) -> None:
         self.assertEqual(
             expand(self.uri, {"endpoint": "users"}),
             "https://api.github.com/users",
         )
 
-    def test_partial(self):
+    def test_partial(self) -> None:
         self.assertEqual(partial(self.uri), URITemplate(self.uri))
         uri = self.uri + "/sigmavirus24{/other}"
         self.assertEqual(
@@ -651,21 +672,21 @@ class TestAPI(TestCase):
             URITemplate("https://api.github.com/users/sigmavirus24{/other}"),
         )
 
-    def test_variables(self):
+    def test_variables(self) -> None:
         self.assertEqual(
             variables(self.uri), URITemplate(self.uri).variable_names
         )
 
 
-class TestNativeTypeSupport(TestCase):
-    context = {
+class TestNativeTypeSupport(unittest.TestCase):
+    context: variable.VariableValueDict = {
         "zero": 0,
         "one": 1,
         "digits": list(range(10)),
         "a_float": 3.1415,
     }
 
-    def test_expand(self):
+    def test_expand(self) -> None:
         self.assertEqual(expand("{zero}", self.context), "0")
         self.assertEqual(expand("{one}", self.context), "1")
         self.assertEqual(
@@ -687,4 +708,4 @@ class TestNativeTypeSupport(TestCase):
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()

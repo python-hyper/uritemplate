@@ -10,11 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         python:
-          - { VERSION: "3.8", TOXENV: "py38", ALLOW_FAILURE: false }
           - { VERSION: "3.9", TOXENV: "py39",ALLOW_FAILURE: false }
           - { VERSION: "3.10", TOXENV: "py310",ALLOW_FAILURE: false }
           - { VERSION: "3.11", TOXENV: "py311,pep8,pre-commit", ALLOW_FAILURE: false }
           - { VERSION: "3.12", TOXENV: "py312",ALLOW_FAILURE: false }
+          - { VERSION: "3.13", TOXENV: "py313",ALLOW_FAILURE: false }
           - { VERSION: "pypy3.10", TOXENV: "pypy", ALLOW_FAILURE: false }
 
     steps:
@@ -37,5 +37,3 @@ jobs:
         run: tox
         env:
           TOXENV: ${{ matrix.PYTHON.TOXENV }}
-          GH_RECORD_MODE: "none"
-        continue-on-error: ${{ matrix.PYTHON.ALLOW_FAILURE }}

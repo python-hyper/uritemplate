@@ -1,7 +1,6 @@
 [tool.black]
 line-length = 78
-target-version = ['py38']
-safe = true
+target-version = ['py39']
 exclude = '''
 (
   /(
@@ -17,3 +16,8 @@ exclude = '''
   )/
 )
 '''
+
+[tool.isort]
+profile = "black"
+line_length = 78
+force_single_line = true
