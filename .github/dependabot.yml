@@ -8,6 +8,6 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
-  group:
+  groups:
     docs:
       applies-to: version-updates
