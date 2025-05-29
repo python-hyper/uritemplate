@@ -134,3 +134,11 @@ class TestExtendedTests(FixtureMixin):
     def test_additional_examples_4(self) -> None:
         """Check Additional Examples 4."""
         self._test("Additional Examples 4: Numeric Keys")
+
+    def test_additional_examples_5(self) -> None:
+        """Check Additional Examples 5."""
+        self._test("Additional Examples 5: Explode Combinations")
+
+    def test_additional_examples_6(self) -> None:
+        """Check Additional Examples 6."""
+        self._test("Additional Examples 6: Reserved Expansion")
