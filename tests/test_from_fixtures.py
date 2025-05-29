@@ -12,7 +12,7 @@ def fixture_file_path(filename: str) -> str:
 
 
 ExampleVariables = uritemplate.variable.VariableValueDict
-ExampleTemplatesAndResults = t.List[t.Tuple[str, str | t.List[str]]]
+ExampleTemplatesAndResults = t.List[t.Tuple[str, t.Union[str, t.List[str]]]]
 
 
 class ExampleWithVariables(t.TypedDict):
@@ -30,7 +30,7 @@ def load_examples(filename: str) -> Examples:
     return examples
 
 
-def expected_set(expected: t.List[str] | str) -> t.Set[str]:
+def expected_set(expected: t.Union[t.List[str], str]) -> t.Set[str]:
     if isinstance(expected, list):
         return set(expected)
     return {expected}

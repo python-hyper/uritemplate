@@ -10,9 +10,9 @@ from uritemplate import variables
 
 
 def merge_dicts(
-    *args: variable.VariableValueDict
-    | t.Dict[str, str]
-    | t.Dict[str, t.List[str]]
+    *args: t.Union[
+        variable.VariableValueDict, t.Dict[str, str], t.Dict[str, t.List[str]]
+    ]
 ) -> variable.VariableValueDict:
     d: t.Dict[str, variable.VariableValue] = {}
     for arg in args:
@@ -21,7 +21,7 @@ def merge_dicts(
 
 
 ExampleVariables = variable.VariableValueDict
-ExampleTemplatesAndResults = t.List[t.Tuple[str, str | t.List[str]]]
+ExampleTemplatesAndResults = t.List[t.Tuple[str, t.Union[str, t.List[str]]]]
 
 
 class ExampleWithVariables(t.TypedDict):
