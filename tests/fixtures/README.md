@@ -1,10 +1,9 @@
-These test are borrowed from https://github.com/uri-templates/uritemplate-test
-at commit: fdd5d611a849b922c2ff40fc3997fd265dd14c02
+
 URI Template Tests
 ==================
 
 This is a set of tests for implementations of
-[RFC6570](http://tools.ietf.org/html/rfc6570) - URI Template. It is designed
+[RFC6570](https://datatracker.ietf.org/doc/html/rfc6570) - URI Template. It is designed
 to be reused by any implementation, to improve interoperability and
 implementation quality.
 

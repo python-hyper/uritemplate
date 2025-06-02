@@ -28,18 +28,8 @@
         "testcases":[
 
             [ "{/id*}" , "/person" ],
-            [ "{/id*}{?fields,first_name,last.name,token}" , [
-            	"/person?fields=id,name,picture&first_name=John&last.name=Doe&token=12345",
-            	"/person?fields=id,picture,name&first_name=John&last.name=Doe&token=12345",
-            	"/person?fields=picture,name,id&first_name=John&last.name=Doe&token=12345",
-            	"/person?fields=picture,id,name&first_name=John&last.name=Doe&token=12345",
-            	"/person?fields=name,picture,id&first_name=John&last.name=Doe&token=12345",
-            	"/person?fields=name,id,picture&first_name=John&last.name=Doe&token=12345"]
-            	],
-            ["/search.{format}{?q,geocode,lang,locale,page,result_type}",
-            	[ "/search.json?q=URI%20Templates&geocode=37.76,-122.427&lang=en&page=5",
-            	  "/search.json?q=URI%20Templates&geocode=-122.427,37.76&lang=en&page=5"]
-                ],
+            [ "{/id*}{?fields,first_name,last.name,token}","/person?fields=id,name,picture&first_name=John&last.name=Doe&token=12345"],
+            ["/search.{format}{?q,geocode,lang,locale,page,result_type}","/search.json?q=URI%20Templates&geocode=37.76,-122.427&lang=en&page=5"],
             ["/test{/Some%20Thing}", "/test/foo" ],
             ["/set{?number}", "/set?number=6"],
             ["/loc{?long,lat}" , "/loc?long=37.76&lat=-122.427"],
@@ -67,21 +57,8 @@
         },
         "testcases":[
 
-            [ "{/id*}" , ["/person/albums","/albums/person"] ],
-            [ "{/id*}{?fields,token}" , [
-            	"/person/albums?fields=id,name,picture&token=12345",
-            	"/person/albums?fields=id,picture,name&token=12345",
-            	"/person/albums?fields=picture,name,id&token=12345",
-            	"/person/albums?fields=picture,id,name&token=12345",
-            	"/person/albums?fields=name,picture,id&token=12345",
-            	"/person/albums?fields=name,id,picture&token=12345",
-            	"/albums/person?fields=id,name,picture&token=12345",
-            	"/albums/person?fields=id,picture,name&token=12345",
-            	"/albums/person?fields=picture,name,id&token=12345",
-            	"/albums/person?fields=picture,id,name&token=12345",
-            	"/albums/person?fields=name,picture,id&token=12345",
-            	"/albums/person?fields=name,id,picture&token=12345"]
-            	]
+            [ "{/id*}" , "/person/albums" ],
+            [ "{/id*}{?fields,token}" , "/person/albums?fields=id,name,picture&token=12345" ]
         ]
     },
     "Additional Examples 3: Empty Variables":{
@@ -113,6 +90,60 @@
             [ "{1337}", "leet,as,it,can,be"],
             [ "{?1337*}", "?1337=leet&1337=as&1337=it&1337=can&1337=be"],
             [ "{?german*}", [ "?11=elf&12=zw%C3%B6lf", "?12=zw%C3%B6lf&11=elf"] ]
+        ]
+    },
+    "Additional Examples 5: Explode Combinations":{
+        "variables" : {
+            "id" : "admin",
+            "token" : "12345",
+            "tab" : "overview",
+            "keys" : {
+                "key1": "val1",
+                "key2": "val2"
+            }
+        },
+        "testcases":[
+            [ "{?id,token,keys*}", [
+                "?id=admin&token=12345&key1=val1&key2=val2",
+                "?id=admin&token=12345&key2=val2&key1=val1"]
+            ],
+            [ "{/id}{?token,keys*}", [
+                "/admin?token=12345&key1=val1&key2=val2",
+                "/admin?token=12345&key2=val2&key1=val1"]
+            ],
+            [ "{?id,token}{&keys*}", [
+                "?id=admin&token=12345&key1=val1&key2=val2",
+                "?id=admin&token=12345&key2=val2&key1=val1"]
+            ],
+            [ "/user{/id}{?token,tab}{&keys*}", [
+                "/user/admin?token=12345&tab=overview&key1=val1&key2=val2",
+                "/user/admin?token=12345&tab=overview&key2=val2&key1=val1"]
+            ]
+        ]
+    },
+    "Additional Examples 6: Reserved Expansion":{
+        "variables" : {
+            "id" : "admin%2F",
+            "not_pct" : "%foo",
+            "list" : ["red%25", "%2Fgreen", "blue "],
+            "keys" : {
+                "key1": "val1%2F",
+                "key2": "val2%2F"
+            }
+        },
+        "testcases": [
+			["{+id}", "admin%2F"],
+			["{#id}", "#admin%2F"],
+			["{id}", "admin%252F"],
+			["{+not_pct}", "%25foo"],
+			["{#not_pct}", "#%25foo"],
+			["{not_pct}", "%25foo"],
+			["{+list}", "red%25,%2Fgreen,blue%20"],
+			["{#list}", "#red%25,%2Fgreen,blue%20"],
+			["{list}", "red%2525,%252Fgreen,blue%20"],
+			["{+keys}", "key1,val1%2F,key2,val2%2F"],
+			["{#keys}", "#key1,val1%2F,key2,val2%2F"],
+			["{keys}", "key1,val1%252F,key2,val2%252F"]
         ]
     }
 }

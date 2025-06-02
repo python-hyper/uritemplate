@@ -44,8 +44,8 @@ class FixtureMixin:
     ) -> t.Tuple[ExampleVariables, ExampleTemplatesAndResults]:
         test = t.cast(ExampleWithVariables, self.examples.get(section, {}))
         return (
-            t.cast(ExampleVariables, test.get("variables", {})),
-            t.cast(ExampleTemplatesAndResults, test.get("testcases", [])),
+            test.get("variables", {}),
+            test.get("testcases", []),
         )
 
     def _test(self, testname: str) -> None:
@@ -53,7 +53,11 @@ class FixtureMixin:
         for template, expected in testcases:
             expected_templates = expected_set(expected)
             expanded = uritemplate.expand(template, variables)
-            assert expanded in expected_templates
+            assert expanded in expected_templates, (  # nosec
+                f"expanded {template!r} with {variables!r} "
+                f"and got {expanded!r} but expected one of "
+                f"{expected_templates!r}"
+            )
 
 
 class TestSpecExamples(FixtureMixin):
@@ -134,3 +138,11 @@ class TestExtendedTests(FixtureMixin):
     def test_additional_examples_4(self) -> None:
         """Check Additional Examples 4."""
         self._test("Additional Examples 4: Numeric Keys")
+
+    def test_additional_examples_5(self) -> None:
+        """Check Additional Examples 5."""
+        self._test("Additional Examples 5: Explode Combinations")
+
+    def test_additional_examples_6(self) -> None:
+        """Check Additional Examples 6."""
+        self._test("Additional Examples 6: Reserved Expansion")
