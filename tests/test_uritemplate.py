@@ -562,7 +562,7 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
         self.assertEqual(
             v._semi_path_expansion("foo", None, False, False), None
         )
-        t.variables[0].operator = "?"
+        t.variables[0].operator = variable.Operator.form_style_query
         self.assertEqual(
             v._semi_path_expansion("foo", ["bar", "bogus"], True, False),
             "foo=bar&foo=bogus",
@@ -586,50 +586,6 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
         t = URITemplate("")
         t.expand(args, key=1)
         self.assertEqual(args, {})
-
-
-class TestURIVariable(unittest.TestCase):
-    def setUp(self) -> None:
-        self.v = variable.URIVariable("{foo}")
-
-    def test_post_parse(self) -> None:
-        v = self.v
-        self.assertEqual(v.join_str, ",")
-        self.assertEqual(v.operator, "")
-        self.assertEqual(v.safe, "")
-        self.assertEqual(v.start, "")
-
-    def test_post_parse_plus(self) -> None:
-        v = self.v
-        v.operator = "+"
-        v.post_parse()
-        self.assertEqual(v.join_str, ",")
-        self.assertEqual(v.safe, variable.URIVariable.reserved)
-        self.assertEqual(v.start, "")
-
-    def test_post_parse_octothorpe(self) -> None:
-        v = self.v
-        v.operator = "#"
-        v.post_parse()
-        self.assertEqual(v.join_str, ",")
-        self.assertEqual(v.safe, variable.URIVariable.reserved)
-        self.assertEqual(v.start, "#")
-
-    def test_post_parse_question(self) -> None:
-        v = self.v
-        v.operator = "?"
-        v.post_parse()
-        self.assertEqual(v.join_str, "&")
-        self.assertEqual(v.safe, "")
-        self.assertEqual(v.start, "?")
-
-    def test_post_parse_ampersand(self) -> None:
-        v = self.v
-        v.operator = "&"
-        v.post_parse()
-        self.assertEqual(v.join_str, "&")
-        self.assertEqual(v.safe, "")
-        self.assertEqual(v.start, "&")
 
 
 class TestVariableModule(unittest.TestCase):
