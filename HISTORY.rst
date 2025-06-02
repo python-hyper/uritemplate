@@ -1,6 +1,15 @@
 Changelog - uritemplate
 =======================
 
+4.2.0 - 2025-06-01
+------------------
+
+- Drop support for Python 3.8
+- Fix bug where already url-encoded values were further escaped and
+  encoded (See https://github.com/python-hyper/uritemplate/issues/99)
+- Refactor ``uritemplate/variable.py`` to enable fixing the
+  aforementioned bug.
+
 4.1.1 - 2021-10-13
 ------------------
 

@@ -20,7 +20,7 @@ __title__ = "uritemplate"
 __author__ = "Ian Stapleton Cordasco"
 __license__ = "Modified BSD or Apache License, Version 2.0"
 __copyright__ = "Copyright 2013 Ian Stapleton Cordasco"
-__version__ = "4.1.1"
+__version__ = "4.2.0"
 __version_info__ = tuple(
     int(i) for i in __version__.split(".") if i.isdigit()
 )
