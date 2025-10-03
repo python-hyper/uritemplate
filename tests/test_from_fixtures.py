@@ -11,7 +11,7 @@ def fixture_file_path(filename: str) -> str:
     return os.path.join(absolute_dir, "fixtures", filename)
 
 
-ExampleVariables = uritemplate.variable.VariableValueDict
+ExampleVariables = uritemplate.variable.VariableValueMapping
 ExampleTemplatesAndResults = t.List[t.Tuple[str, t.Union[str, t.List[str]]]]
 
 

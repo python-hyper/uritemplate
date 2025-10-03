@@ -25,11 +25,11 @@ template_re = re.compile("{([^}]+)}")
 
 
 def _merge(
-    var_dict: t.Optional[variable.VariableValueDict],
-    overrides: variable.VariableValueDict,
-) -> variable.VariableValueDict:
+    var_dict: t.Optional[variable.VariableValueMapping],
+    overrides: variable.VariableValueMapping,
+) -> variable.VariableValueMapping:
     if var_dict:
-        opts = var_dict.copy()
+        opts = dict(var_dict)
         opts.update(overrides)
         return opts
     return overrides
@@ -97,7 +97,7 @@ class URITemplate:
         return hash(self.uri)
 
     def _expand(
-        self, var_dict: variable.VariableValueDict, replace: bool
+        self, var_dict: variable.VariableValueMapping, replace: bool
     ) -> str:
         if not self.variables:
             return self.uri
@@ -121,7 +121,7 @@ class URITemplate:
 
     def expand(
         self,
-        var_dict: t.Optional[variable.VariableValueDict] = None,
+        var_dict: t.Optional[variable.VariableValueMapping] = None,
         **kwargs: variable.VariableValue,
     ) -> str:
         """Expand the template with the given parameters.
@@ -148,7 +148,7 @@ class URITemplate:
 
     def partial(
         self,
-        var_dict: t.Optional[variable.VariableValueDict] = None,
+        var_dict: t.Optional[variable.VariableValueMapping] = None,
         **kwargs: variable.VariableValue,
     ) -> "URITemplate":
         """Partially expand the template with the given parameters.

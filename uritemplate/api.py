@@ -18,7 +18,7 @@ __all__ = ("OrderedSet", "URITemplate", "expand", "partial", "variables")
 
 def expand(
     uri: str,
-    var_dict: t.Optional[variable.VariableValueDict] = None,
+    var_dict: t.Optional[variable.VariableValueMapping] = None,
     **kwargs: variable.VariableValue,
 ) -> str:
     """Expand the template with the given parameters.
@@ -46,7 +46,7 @@ def expand(
 
 def partial(
     uri: str,
-    var_dict: t.Optional[variable.VariableValueDict] = None,
+    var_dict: t.Optional[variable.VariableValueMapping] = None,
     **kwargs: variable.VariableValue,
 ) -> URITemplate:
     """Partially expand the template with the given parameters.
