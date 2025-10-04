@@ -11,16 +11,18 @@ from uritemplate import variables
 
 def merge_dicts(
     *args: t.Union[
-        variable.VariableValueDict, t.Dict[str, str], t.Dict[str, t.List[str]]
+        variable.VariableValueMapping,
+        t.Dict[str, str],
+        t.Dict[str, t.List[str]],
     ]
-) -> variable.VariableValueDict:
+) -> variable.VariableValueMapping:
     d: t.Dict[str, variable.VariableValue] = {}
     for arg in args:
         d.update(arg)
     return d
 
 
-ExampleVariables = variable.VariableValueDict
+ExampleVariables = variable.VariableValueMapping
 ExampleTemplatesAndResults = t.List[t.Tuple[str, t.Union[str, t.List[str]]]]
 
 
@@ -582,7 +584,7 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
         self.assertEqual(d, {t: 2})
 
     def test_no_mutate(self) -> None:
-        args: variable.VariableValueDict = {}
+        args: variable.VariableValueMapping = {}
         t = URITemplate("")
         t.expand(args, key=1)
         self.assertEqual(args, {})
@@ -635,7 +637,7 @@ class TestAPI(unittest.TestCase):
 
 
 class TestNativeTypeSupport(unittest.TestCase):
-    context: variable.VariableValueDict = {
+    context: variable.VariableValueMapping = {
         "zero": 0,
         "one": 1,
         "digits": list(range(10)),

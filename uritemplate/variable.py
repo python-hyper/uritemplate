@@ -29,7 +29,7 @@ VariableValue = t.Union[
     t.Tuple[str, ScalarVariableValue],
     ScalarVariableValue,
 ]
-VariableValueDict = t.Dict[str, VariableValue]
+VariableValueMapping = t.Mapping[str, VariableValue]
 
 
 _UNRESERVED_CHARACTERS: t.Final[str] = (
@@ -451,7 +451,7 @@ class URIVariable:
         return self.operator.quote(value)
 
     def expand(
-        self, var_dict: t.Optional[VariableValueDict] = None
+        self, var_dict: t.Optional[VariableValueMapping] = None
     ) -> t.Mapping[str, str]:
         """Expand the variable in question.
 
