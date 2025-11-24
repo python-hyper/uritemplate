@@ -44,7 +44,7 @@
 											</xsl:when>
 											<xsl:when test="$s='b'">
 												<!--xsl:text>&#8;</xsl:text-->
-												<xsl:message select="'escape sequense \b is not supported by XML'"/>
+												<xsl:message select="'escape sequence \b is not supported by XML'"/>
 												<xsl:text>\b</xsl:text>
 											</xsl:when>
 											<xsl:when test="$s='t'">
