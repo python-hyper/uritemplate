@@ -1,6 +1,15 @@
 Changelog - uritemplate
 =======================
 
+Unreleased
+----------
+
+- Fix bug where reserved (``+``) and fragment (``#``) expansion left
+  disallowed characters (such as spaces) unencoded whenever the value also
+  contained an already percent-encoded triple. This was a regression from the
+  fix for
+  `issue #99 <https://github.com/python-hyper/uritemplate/issues/99>`_.
+
 4.2.0 - 2025-06-01
 ------------------
 
