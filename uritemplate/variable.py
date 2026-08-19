@@ -17,6 +17,7 @@ What do you do?
 
 import collections.abc
 import enum
+import re
 import string
 import typing as t
 import urllib.parse
@@ -38,6 +39,8 @@ _UNRESERVED_CHARACTERS: t.Final[str] = (
 _GEN_DELIMS: t.Final[str] = ":/?#[]@"
 _SUB_DELIMS: t.Final[str] = "!$&'()*+,;="
 _RESERVED_CHARACTERS: t.Final[str] = f"{_GEN_DELIMS}{_SUB_DELIMS}"
+
+_pct_encoded = re.compile("%[0-9A-Fa-f]{2}")
 
 
 class Operator(enum.Enum):
@@ -562,3 +565,22 @@ def quote(value: t.Any, safe: str) -> str:
     if not isinstance(value, (str, bytes)):
         value = str(value)
     return urllib.parse.quote(_encode(value), safe)
+
+
+def encode_literal(literal: str) -> str:
+    """Percent-encode template literal text per RFC 6570 Section 3.1.
+
+    Characters allowed in a URI (unreserved, reserved, or already
+    percent-encoded) are copied verbatim; any other character is encoded as
+    its UTF-8 percent-encoded octets. Existing ``%XX`` triplets are preserved
+    rather than being re-encoded.
+    """
+    encoded = []
+    index = 0
+    for match in _pct_encoded.finditer(literal):
+        start, end = match.start(), match.end()
+        encoded.append(quote(literal[index:start], _RESERVED_CHARACTERS))
+        encoded.append(match.group())
+        index = end
+    encoded.append(quote(literal[index:], _RESERVED_CHARACTERS))
+    return "".join(encoded)
