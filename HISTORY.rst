@@ -1,6 +1,13 @@
 Changelog - uritemplate
 =======================
 
+Unreleased
+----------
+
+- Percent-encode disallowed characters in template literal text as required
+  by RFC 6570 Section 3.1 (e.g. the literal in ``café/{x}`` now expands to
+  ``caf%C3%A9/...``).
+
 4.2.0 - 2025-06-01
 ------------------
 

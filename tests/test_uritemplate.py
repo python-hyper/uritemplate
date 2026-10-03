@@ -450,6 +450,45 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
             t.expand({"repo": "github3.py"}, user="sigmavirus24"), expanded
         )
 
+    def test_literal_encoding(self) -> None:
+        """Literal text is percent-encoded per RFC 6570 Section 3.1."""
+        # Official uri-templates/uritemplate-test "Literal Encoding" cases.
+        self.assertEqual(
+            URITemplate("café/{var}").expand(var="value"), "caf%C3%A9/value"
+        )
+        self.assertEqual(
+            URITemplate("x%20y/{var}").expand(var="value"), "x%20y/value"
+        )
+        self.assertEqual(
+            URITemplate("x%20y{var}z%20w").expand(var="value"),
+            "x%20yvaluez%20w",
+        )
+        # Multi-octet literal and a literal with no expression at all.
+        self.assertEqual(URITemplate("€/{v}").expand(v="1"), "%E2%82%AC/1")
+        self.assertEqual(URITemplate("café").expand(), "caf%C3%A9")
+        # Space and a bare percent sign are not URI-legal and get encoded.
+        self.assertEqual(URITemplate("a b/{v}").expand(v="1"), "a%20b/1")
+        self.assertEqual(URITemplate("100%/{v}").expand(v="1"), "100%25/1")
+        # Reserved characters and existing triples are kept verbatim.
+        self.assertEqual(URITemplate("a,b:c/{v}").expand(v="1"), "a,b:c/1")
+        self.assertEqual(URITemplate("%C3%A9/{v}").expand(v="1"), "%C3%A9/1")
+
+    def test_literal_encoding_across_operators(self) -> None:
+        """Literal runs are encoded around every expression operator."""
+        for expr in ("{v}", "{+v}", "{#v}", "{/v}", "{.v}", "{?v}", "{&v}"):
+            expanded = URITemplate("café" + expr).expand(v="x")
+            self.assertTrue(expanded.startswith("caf%C3%A9"), expanded)
+        # The expanded value is not double-encoded by the literal pass.
+        self.assertEqual(
+            URITemplate("café{?q}").expand(q="thé"), "caf%C3%A9?q=th%C3%A9"
+        )
+
+    def test_literal_encoding_idempotent_on_partial(self) -> None:
+        """Partial expansion keeps literals encoded exactly once."""
+        template = URITemplate("café{?q}").partial()
+        self.assertEqual(str(template), "caf%C3%A9{?q}")
+        self.assertEqual(template.expand(q="thé"), "caf%C3%A9?q=th%C3%A9")
+
     def test_str_repr(self) -> None:
         uri = "https://api.github.com{/endpoint}"
         t = URITemplate(uri)
@@ -611,6 +650,13 @@ class TestVariableModule(unittest.TestCase):
 
         d = dict(a_list)
         self.assertEqual(variable.dict_test(d), True)
+
+    def test_encode_literal(self) -> None:
+        self.assertEqual(variable.encode_literal("café"), "caf%C3%A9")
+        self.assertEqual(variable.encode_literal("x%20y"), "x%20y")
+        self.assertEqual(variable.encode_literal("a,b:c"), "a,b:c")
+        self.assertEqual(variable.encode_literal("100%"), "100%25")
+        self.assertEqual(variable.encode_literal(""), "")
 
 
 class TestAPI(unittest.TestCase):
