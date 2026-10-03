@@ -665,5 +665,31 @@ class TestNativeTypeSupport(unittest.TestCase):
         self.assertEqual(expand("{/zero,a_float}", self.context), "/0/3.1415")
 
 
+class TestNoneListValues(unittest.TestCase):
+    def test_expansion_ignores_none_list_items_for_all_operators(
+        self,
+    ) -> None:
+        values = {"x": ["a", None, "b"]}
+        expected = {
+            "{x}": "a,b",
+            "{+x}": "a,b",
+            "{#x}": "#a,b",
+            "{.x}": ".a,b",
+            "{.x*}": ".a.b",
+            "{/x}": "/a,b",
+            "{/x*}": "/a/b",
+            "{;x}": ";x=a,b",
+            "{;x*}": ";x=a;x=b",
+            "{?x}": "?x=a,b",
+            "{?x*}": "?x=a&x=b",
+            "{&x}": "&x=a,b",
+            "{&x*}": "&x=a&x=b",
+        }
+
+        for template, result in expected.items():
+            with self.subTest(template=template):
+                self.assertEqual(URITemplate(template).expand(values), result)
+
+
 if __name__ == "__main__":
     unittest.main()
