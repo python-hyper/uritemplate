@@ -589,6 +589,20 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
         t.expand(args, key=1)
         self.assertEqual(args, {})
 
+    def test_reserved_expansion_encodes_around_pct_triples(self) -> None:
+        # A value mixing disallowed characters with an already valid
+        # percent-encoded triple must still encode the disallowed characters
+        # (the triple is preserved, the rest is quoted) -- RFC 6570 3.2.3.
+        self.assertEqual(URITemplate("{+v}").expand(v="a b%20c"), "a%20b%20c")
+        self.assertEqual(
+            URITemplate("{#v}").expand(v="x y%20z"), "#x%20y%20z"
+        )
+        # Uppercase triple preserved; reserved characters left untouched.
+        self.assertEqual(URITemplate("{+v}").expand(v="a%2Fb c"), "a%2Fb%20c")
+        # No triple present -> ordinary quoting; all triples -> left as-is.
+        self.assertEqual(URITemplate("{+v}").expand(v="a b c"), "a%20b%20c")
+        self.assertEqual(URITemplate("{+v}").expand(v="%20"), "%20")
+
 
 class TestVariableModule(unittest.TestCase):
     def test_is_list_of_tuples(self) -> None:

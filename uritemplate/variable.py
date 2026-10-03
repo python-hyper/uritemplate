@@ -17,6 +17,7 @@ What do you do?
 
 import collections.abc
 import enum
+import re
 import string
 import typing as t
 import urllib.parse
@@ -38,6 +39,7 @@ _UNRESERVED_CHARACTERS: t.Final[str] = (
 _GEN_DELIMS: t.Final[str] = ":/?#[]@"
 _SUB_DELIMS: t.Final[str] = "!$&'()*+,;="
 _RESERVED_CHARACTERS: t.Final[str] = f"{_GEN_DELIMS}{_SUB_DELIMS}"
+_PERCENT_ENCODED: t.Final[re.Pattern[str]] = re.compile("%[0-9A-Fa-f]{2}")
 
 
 class Operator(enum.Enum):
@@ -150,9 +152,20 @@ class Operator(enum.Enum):
         return quote(value, "")
 
     def _only_quote_unquoted_characters(self, value: str) -> str:
-        if urllib.parse.unquote(value) == value:
-            return quote(value, _RESERVED_CHARACTERS)
-        return value
+        # For reserved ("+") and fragment ("#") expansion, already
+        # percent-encoded triples must be preserved (RFC 6570 Section 3.2.3).
+        # Quote every other disallowed character while leaving valid triples
+        # untouched, rather than passing the whole value through unquoted as
+        # soon as a single triple is present.
+        result = []
+        last = 0
+        for match in _PERCENT_ENCODED.finditer(value):
+            start, end = match.start(), match.end()
+            result.append(quote(value[last:start], _RESERVED_CHARACTERS))
+            result.append(match.group())
+            last = end
+        result.append(quote(value[last:], _RESERVED_CHARACTERS))
+        return "".join(result)
 
     def quote(self, value: t.Any) -> str:
         if not isinstance(value, (str, bytes)):
