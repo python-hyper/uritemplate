@@ -664,6 +664,34 @@ class TestNativeTypeSupport(unittest.TestCase):
         self.assertEqual(expand("{/zero}", self.context), "/0")
         self.assertEqual(expand("{/zero,a_float}", self.context), "/0/3.1415")
 
+    def test_zero_parameter_expansions(self) -> None:
+        cases: t.List[t.Tuple[variable.ScalarVariableValue, str]] = [
+            (0, "0"),
+            (0.0, "0.0"),
+            (-0.0, "-0.0"),
+            (0j, "0j"),
+        ]
+        for value, expected in cases:
+            for operator in ("?", "&", ";"):
+                for modifier in ("", "*"):
+                    template = f"{{{operator}zero{modifier}}}"
+                    with self.subTest(template=template, value=value):
+                        self.assertEqual(
+                            expand(template, {"zero": value}),
+                            f"{operator}zero={expected}",
+                        )
+
+    def test_empty_parameter_expansions(self) -> None:
+        for operator, expected in (
+            ("?", "?zero="),
+            ("&", "&zero="),
+            (";", ";zero"),
+        ):
+            template = f"{{{operator}zero}}"
+            with self.subTest(template=template):
+                self.assertEqual(expand(template, {"zero": ""}), expected)
+                self.assertEqual(expand(template, {"zero": None}), "")
+
 
 if __name__ == "__main__":
     unittest.main()
