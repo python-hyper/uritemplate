@@ -145,5 +145,16 @@
 			["{#keys}", "#key1,val1%2F,key2,val2%2F"],
 			["{keys}", "key1,val1%252F,key2,val2%252F"]
         ]
+    },
+    "Additional Examples 8: Literal Encoding":{
+        "level":4,
+        "variables":{
+            "var" : "value"
+        },
+        "testcases":[
+            [ "café/{var}" , "caf%C3%A9/value" ],
+            [ "x%20y/{var}" , "x%20y/value" ],
+            [ "x%20y{var}z%20w" , "x%20yvaluez%20w" ]
+        ]
     }
 }

@@ -99,13 +99,9 @@ class URITemplate:
     def _expand(
         self, var_dict: variable.VariableValueMapping, replace: bool
     ) -> str:
-        if not self.variables:
-            return self.uri
-
-        expansion = var_dict
         expanded: t.Dict[str, str] = {}
         for v in self.variables:
-            expanded.update(v.expand(expansion))
+            expanded.update(v.expand(var_dict))
 
         def replace_all(match: "re.Match[str]") -> str:
             return expanded.get(match.groups()[0], "")
@@ -117,7 +113,18 @@ class URITemplate:
 
         replace_func = replace_partial if replace else replace_all
 
-        return template_re.sub(replace_func, self.uri)
+        # Percent-encode literal runs (RFC 6570 3.1) around each expanded
+        # expression; a single-pass re.sub would re-encode the expansion
+        # output, so encode the literals and expand the expressions separately.
+        result: t.List[str] = []
+        index = 0
+        for match in template_re.finditer(self.uri):
+            start, end = match.start(), match.end()
+            result.append(variable.encode_literal(self.uri[index:start]))
+            result.append(replace_func(match))
+            index = end
+        result.append(variable.encode_literal(self.uri[index:]))
+        return "".join(result)
 
     def expand(
         self,
