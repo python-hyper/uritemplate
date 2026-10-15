@@ -665,5 +665,68 @@ class TestNativeTypeSupport(unittest.TestCase):
         self.assertEqual(expand("{/zero,a_float}", self.context), "/0/3.1415")
 
 
+class TestNoneListValues(unittest.TestCase):
+    def test_expansion_ignores_none_list_items_for_all_operators(
+        self,
+    ) -> None:
+        values = {"x": ["a", None, "b"]}
+        expected = {
+            "{x}": "a,b",
+            "{x*}": "a,b",
+            "{+x}": "a,b",
+            "{+x*}": "a,b",
+            "{#x}": "#a,b",
+            "{#x*}": "#a,b",
+            "{.x}": ".a,b",
+            "{.x*}": ".a.b",
+            "{/x}": "/a,b",
+            "{/x*}": "/a/b",
+            "{;x}": ";x=a,b",
+            "{;x*}": ";x=a;x=b",
+            "{?x}": "?x=a,b",
+            "{?x*}": "?x=a&x=b",
+            "{&x}": "&x=a,b",
+            "{&x*}": "&x=a&x=b",
+        }
+
+        for template, result in expected.items():
+            with self.subTest(template=template):
+                self.assertEqual(URITemplate(template).expand(values), result)
+
+    def test_expansion_preserves_defined_empty_and_zero_list_items(
+        self,
+    ) -> None:
+        values = {"x": ["", None, 0, None, "b"]}
+        expected = {
+            "{x}": ",0,b",
+            "{x*}": ",0,b",
+            "{+x}": ",0,b",
+            "{+x*}": ",0,b",
+            "{#x}": "#,0,b",
+            "{#x*}": "#,0,b",
+            "{.x}": ".,0,b",
+            "{.x*}": "..0.b",
+            "{/x}": "/,0,b",
+            "{/x*}": "//0/b",
+            "{;x}": ";x=,0,b",
+            "{;x*}": ";x=;x=0;x=b",
+            "{?x}": "?x=,0,b",
+            "{?x*}": "?x=&x=0&x=b",
+            "{&x}": "&x=,0,b",
+            "{&x*}": "&x=&x=0&x=b",
+        }
+
+        for template, result in expected.items():
+            with self.subTest(template=template):
+                self.assertEqual(URITemplate(template).expand(values), result)
+
+    def test_expansion_does_not_mutate_none_containing_lists(self) -> None:
+        values = {"x": ["a", None, "b"]}
+        for template in ("{x}", "{.x}", "{;x}", "{?x}"):
+            with self.subTest(template=template):
+                URITemplate(template).expand(values)
+                self.assertEqual(values, {"x": ["a", None, "b"]})
+
+
 if __name__ == "__main__":
     unittest.main()

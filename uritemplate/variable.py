@@ -284,9 +284,10 @@ class URIVariable:
         safe = self.operator.reserved_characters()
         _quote = self.operator.quote
         if list_test(value) and not tuples:
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
+            value = [v for v in value if v is not None]
             if not value:
                 return None
-            value = t.cast(t.Sequence[ScalarVariableValue], value)
             if explode:
                 return self.operator.expansion_separator().join(
                     f"{name}={_quote(v)}" for v in value
@@ -340,13 +341,12 @@ class URIVariable:
         tuples, items = is_list_of_tuples(value)
 
         if list_test(value) and not tuples:
+            value = t.cast(t.Sequence[ScalarVariableValue], value)
+            value = [v for v in value if v is not None]
             if not explode:
                 join_str = ","
 
-            value = t.cast(t.Sequence[ScalarVariableValue], value)
-            fragments = [
-                self.operator.quote(v) for v in value if v is not None
-            ]
+            fragments = [self.operator.quote(v) for v in value]
             return join_str.join(fragments) if fragments else None
 
         if dict_test(value) or tuples:
@@ -386,9 +386,10 @@ class URIVariable:
 
         if list_test(value) and not tuples:
             value = t.cast(t.Sequence[ScalarVariableValue], value)
+            value = [v for v in value if v is not None]
             if explode:
                 expanded = join_str.join(
-                    f"{name}={quote(v, safe)}" for v in value if v is not None
+                    f"{name}={quote(v, safe)}" for v in value
                 )
                 return expanded if expanded else None
             else:
@@ -434,6 +435,7 @@ class URIVariable:
 
         if list_test(value) and not tuples:
             value = t.cast(t.Sequence[ScalarVariableValue], value)
+            value = [v for v in value if v is not None]
             return ",".join(self.operator.quote(v) for v in value)
 
         if dict_test(value) or tuples:
