@@ -310,11 +310,9 @@ class URIVariable:
                 )
                 return f"{name}={value}"
 
-        if value:
-            value = t.cast(t.Text, value)
-            value = value[:prefix] if prefix else value
-            return f"{name}={_quote(value)}"
-        return name + "="
+        value = t.cast(t.Text, value)
+        value = value[:prefix] if prefix else value
+        return f"{name}={_quote(value)}"
 
     def _label_path_expansion(
         self,
@@ -415,8 +413,9 @@ class URIVariable:
 
         value = t.cast(t.Text, value)
         value = value[:prefix] if prefix else value
+        value = self.operator.quote(value)
         if value:
-            return f"{name}={self.operator.quote(value)}"
+            return f"{name}={value}"
 
         return name
 
