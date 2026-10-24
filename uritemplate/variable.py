@@ -17,6 +17,7 @@ What do you do?
 
 import collections.abc
 import enum
+import re
 import string
 import typing as t
 import urllib.parse
@@ -38,6 +39,7 @@ _UNRESERVED_CHARACTERS: t.Final[str] = (
 _GEN_DELIMS: t.Final[str] = ":/?#[]@"
 _SUB_DELIMS: t.Final[str] = "!$&'()*+,;="
 _RESERVED_CHARACTERS: t.Final[str] = f"{_GEN_DELIMS}{_SUB_DELIMS}"
+_PCT_ENCODED_RE: t.Final[t.Pattern[str]] = re.compile(r"(%[0-9a-fA-F]{2})")
 
 
 class Operator(enum.Enum):
@@ -150,9 +152,10 @@ class Operator(enum.Enum):
         return quote(value, "")
 
     def _only_quote_unquoted_characters(self, value: str) -> str:
-        if urllib.parse.unquote(value) == value:
-            return quote(value, _RESERVED_CHARACTERS)
-        return value
+        parts = _PCT_ENCODED_RE.split(value)
+        for i in range(0, len(parts), 2):
+            parts[i] = quote(parts[i], _RESERVED_CHARACTERS)
+        return "".join(parts)
 
     def quote(self, value: t.Any) -> str:
         if not isinstance(value, (str, bytes)):
@@ -311,8 +314,7 @@ class URIVariable:
                 return f"{name}={value}"
 
         if value:
-            value = t.cast(t.Text, value)
-            value = value[:prefix] if prefix else value
+            value = str(value)[:prefix] if prefix else value
             return f"{name}={_quote(value)}"
         return name + "="
 
@@ -364,8 +366,7 @@ class URIVariable:
             )
             return expanded if expanded else None
 
-        value = t.cast(t.Text, value)
-        value = value[:prefix] if prefix else value
+        value = str(value)[:prefix] if prefix else value
         return self.operator.quote(value)
 
     def _semi_path_expansion(
@@ -413,8 +414,7 @@ class URIVariable:
                 )
                 return f"{name}={expanded}"
 
-        value = t.cast(t.Text, value)
-        value = value[:prefix] if prefix else value
+        value = str(value)[:prefix] if prefix else value
         if value:
             return f"{name}={self.operator.quote(value)}"
 
@@ -446,8 +446,7 @@ class URIVariable:
                 for k, v in items
             )
 
-        value = t.cast(t.Text, value)
-        value = value[:prefix] if prefix else value
+        value = str(value)[:prefix] if prefix else value
         return self.operator.quote(value)
 
     def expand(

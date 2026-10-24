@@ -589,6 +589,14 @@ class TestURITemplate(unittest.TestCase, metaclass=RFCTemplateExamples):
         t.expand(args, key=1)
         self.assertEqual(args, {})
 
+    def test_reserved_expansion_with_percent_escapes(self) -> None:
+        self.assertEqual(expand("{+var}", {"var": "a b%41"}), "a%20b%41")
+        self.assertEqual(expand("{#var}", {"var": "a b%41"}), "#a%20b%41")
+        self.assertEqual(
+            expand("{+path}", {"path": "/foo bar/baz%20qux"}),
+            "/foo%20bar/baz%20qux",
+        )
+
 
 class TestVariableModule(unittest.TestCase):
     def test_is_list_of_tuples(self) -> None:
@@ -663,6 +671,11 @@ class TestNativeTypeSupport(unittest.TestCase):
         # explicit testing for issue #53
         self.assertEqual(expand("{/zero}", self.context), "/0")
         self.assertEqual(expand("{/zero,a_float}", self.context), "/0/3.1415")
+        # explicit testing for issue #163
+        self.assertEqual(expand("{a_float:3}", self.context), "3.1")
+        self.assertEqual(expand("{?a_float:3}", self.context), "?a_float=3.1")
+        self.assertEqual(expand("{/a_float:3}", self.context), "/3.1")
+        self.assertEqual(expand("{;a_float:3}", self.context), ";a_float=3.1")
 
 
 if __name__ == "__main__":
