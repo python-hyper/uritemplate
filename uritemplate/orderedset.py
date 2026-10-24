@@ -89,4 +89,4 @@ class OrderedSet(t.MutableSet[str]):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         other = t.cast(t.Iterable[str], other)
-        return not self.isdisjoint(other)
+        return set(self) == set(other)
