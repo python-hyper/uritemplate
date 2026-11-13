@@ -549,7 +549,7 @@ def list_test(value: t.Any) -> bool:
 
 
 def dict_test(value: t.Any) -> bool:
-    return isinstance(value, (dict, collections.abc.MutableMapping))
+    return isinstance(value, collections.abc.Mapping)
 
 
 def _encode(value: t.AnyStr, encoding: str = "utf-8") -> bytes:
